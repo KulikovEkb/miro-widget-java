@@ -5,6 +5,10 @@ import com.miro.widget.service.models.*;
 import com.miro.widget.service.repositories.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import result.PlainResult;
+import result.Result;
+import result.errors.Error;
+import result.errors.NotFoundError;
 
 import java.time.ZonedDateTime;
 import java.util.Comparator;
@@ -29,56 +33,57 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
         this.mapper = mapper;
     }
 
-    public V1WidgetDto v1Insert(V1InsertWidgetModel model) {
+    public Result<V1WidgetDto> v1Insert(V1InsertWidgetModel model) {
         var widgetEntity = mapper.v1InsertModelToEntity(model);
 
-        idToWidgetMap.put(widgetEntity.getId(), widgetEntity);
-        zIndexToWidgetMap.put(widgetEntity.getZ(), widgetEntity);
+        try {
+            idToWidgetMap.put(widgetEntity.getId(), widgetEntity);
+            zIndexToWidgetMap.put(widgetEntity.getZ(), widgetEntity);
+        } catch (Exception exc) {
+            var error = String.format("Failed to insert widget %s: %s", model, exc.getMessage());
+            return Result.Fail(new Error(error));
+        }
 
-        return mapper.v1EntityToDto(widgetEntity);
+        return Result.Ok(mapper.v1EntityToDto(widgetEntity));
     }
 
-    public V1WidgetDto v1GetById(UUID id) {
+    public Result<V1WidgetDto> v1GetById(UUID id) {
         var widgetEntity = idToWidgetMap.getOrDefault(id, null);
 
         if (widgetEntity == null)
-            return null;
-        // todo(kulikov): uncomment
-        /*if (widget == null){
-            return new Result(NotFoundError);*/
+            return Result.Fail(new NotFoundError(String.format("Widget with id '%s' not found", id)));
 
-        return mapper.v1EntityToDto(widgetEntity);
+        return Result.Ok(mapper.v1EntityToDto(widgetEntity));
     }
 
-    public V1WidgetDto v1GetByZIndex(int z) {
+    public Result<V1WidgetDto> v1GetByZIndex(int z) {
         var widgetEntity = zIndexToWidgetMap.getOrDefault(z, null);
 
         if (widgetEntity == null)
-            return null;
-        // todo(kulikov): uncomment
-        /*if (widget == null){
-            return new Result(NotFoundError);*/
+            return Result.Fail(new NotFoundError(String.format("widget with z index '%d' not found", z)));
 
-        return mapper.v1EntityToDto(widgetEntity);
+        return Result.Ok(mapper.v1EntityToDto(widgetEntity));
     }
 
-    public List<V1WidgetDto> v1GetAll() {
-        return idToWidgetMap
-            .values()
-            .stream()
-            .map(mapper::v1EntityToDto)
-            .sorted(Comparator.comparing(V1WidgetDto::getZ))
-            .collect(Collectors.toList());
+    public Result<List<V1WidgetDto>> v1GetAll() {
+        try {
+            return Result.Ok(idToWidgetMap
+                .values()
+                .stream()
+                .map(mapper::v1EntityToDto)
+                .sorted(Comparator.comparing(V1WidgetDto::getZ))
+                .collect(Collectors.toList()));
+        } catch (Exception exc) {
+            var error = String.format("Failed to retrieve all widgets: %s", exc.getMessage());
+            return Result.Fail(new Error(error));
+        }
     }
 
-    public V1WidgetDto v1Update(V1UpdateWidgetModel model) {
+    public Result<V1WidgetDto> v1Update(V1UpdateWidgetModel model) {
         var widgetEntity = idToWidgetMap.getOrDefault(model.getId(), null);
 
         if (widgetEntity == null)
-            return null;
-        // todo(kulikov): uncomment
-        /*if (widget == null){
-            return new Result(NotFoundError);*/
+            return Result.Fail(new NotFoundError(String.format("Widget with id '%s' not found", model.getId())));
 
         if (model.getCenterX() != null)
             widgetEntity.setCenterX(model.getCenterX());
@@ -99,16 +104,40 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
 
         widgetEntity.setUpdatedAt(ZonedDateTime.now());
 
-        return mapper.v1EntityToDto(widgetEntity);
+        return Result.Ok(mapper.v1EntityToDto(widgetEntity));
     }
 
-    public void v1Delete(UUID id) {
-        var widgetEntity = idToWidgetMap.remove(id);
-        zIndexToWidgetMap.remove(widgetEntity.getZ());
+    public PlainResult v1Delete(UUID id) {
+        var removedByIdWidget = idToWidgetMap.remove(id);
+        if (removedByIdWidget == null)
+            return PlainResult.Fail(new NotFoundError(String.format("Widget with id '%s' not found", id)));
+
+        var removedByZIndexWidget = zIndexToWidgetMap.remove(removedByIdWidget.getZ());
+        if (removedByZIndexWidget == null) {
+            var error = String.format(
+                "Widget with z index '%d' wasn't found while one with ID '%s' was", removedByIdWidget.getZ(), id);
+            return PlainResult.Fail(new Error(error));
+        }
+
+        if (!removedByIdWidget.equals(removedByZIndexWidget)) {
+            return PlainResult.Fail(new Error(String.format(
+                "Widget deleted by ID is not the same as deleted by z index. First: %s, second: %s",
+                removedByIdWidget,
+                removedByZIndexWidget)));
+        }
+
+        return PlainResult.Ok();
     }
 
-    public void v1DeleteAll() {
-        idToWidgetMap.clear();
-        zIndexToWidgetMap.clear();
+    public PlainResult v1DeleteAll() {
+        try {
+            idToWidgetMap.clear();
+            zIndexToWidgetMap.clear();
+        } catch (Exception exc) {
+            var error = String.format("Failed to delete all widgets: %s", exc.getMessage());
+            return PlainResult.Fail(new Error(error));
+        }
+
+        return PlainResult.Ok();
     }
 }

@@ -8,6 +8,8 @@ import com.miro.widget.service.repositories.models.V1InsertWidgetModel;
 import com.miro.widget.service.repositories.models.V1UpdateWidgetModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import result.PlainResult;
+import result.Result;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +24,7 @@ class WidgetServiceImpl implements WidgetService {
         this.widgetRepository = widgetRepository;
     }
 
-    public V1WidgetDto v1Create(V1CreateWidgetDto dto) {
+    public Result<V1WidgetDto> v1Create(V1CreateWidgetDto dto) {
         if (dto.getZ() != null)
             shift(dto.getZ());
 
@@ -35,21 +37,21 @@ class WidgetServiceImpl implements WidgetService {
         ));
     }
 
-    public V1WidgetDto v1GetById(UUID id) {
+    public Result<V1WidgetDto> v1GetById(UUID id) {
         return widgetRepository.v1GetById(id);
     }
 
-    public List<V1WidgetDto> v1GetAll() {
+    public Result<List<V1WidgetDto>> v1GetAll() {
         return widgetRepository.v1GetAll();
     }
 
-    public V1WidgetDto v1Update(UUID id, V1UpdateWidgetDto dto) {
+    public Result<V1WidgetDto> v1Update(UUID id, V1UpdateWidgetDto dto) {
         // todo(kulikov): fix that
-        //if (dto.ZIndex.HasValue)
-        //{
-        //    var currentWidget = await _widgetRepository.V1GetById(dto.Id);
-        //    await Shift(dto.ZIndex.Value, currentWidget.Value.ZIndex);
-        //}
+        /*if (dto.ZIndex.HasValue)
+        {
+            var currentWidget = await _widgetRepository.V1GetById(dto.Id);
+            await Shift(dto.ZIndex.Value, currentWidget.Value.ZIndex);
+        }*/
         if (dto.getZ() != null) {
             var currentWidget = widgetRepository.v1GetById(id);
 
@@ -65,8 +67,8 @@ class WidgetServiceImpl implements WidgetService {
             id, dto.getZ(), dto.getCenterX(), dto.getCenterY(), dto.getWidth(), dto.getHeight()));
     }
 
-    public void v1Delete(UUID id) {
-        widgetRepository.v1Delete(id);
+    public PlainResult v1Delete(UUID id) {
+        return widgetRepository.v1Delete(id);
     }
 
     void shift(int startIndex) {
@@ -74,14 +76,14 @@ class WidgetServiceImpl implements WidgetService {
     }
 
     void shift(int startIndex, int endIndex) {
-        var swapItem = widgetRepository.v1GetByZIndex(startIndex);
+        var getSwapItemResult = widgetRepository.v1GetByZIndex(startIndex);
 
-        for (var i = startIndex + 1; swapItem != null && i <= endIndex; i++) {
+        for (var i = startIndex + 1; getSwapItemResult.isSucceed() && i <= endIndex; i++) {
             var tempItem = widgetRepository.v1GetByZIndex(i);
 
-            widgetRepository.v1Update(new V1UpdateWidgetModel(swapItem.getId(), i));
+            widgetRepository.v1Update(new V1UpdateWidgetModel(getSwapItemResult.getValue().getId(), i));
 
-            swapItem = tempItem;
+            getSwapItemResult = tempItem;
 
             if (i >= nextMaxIndex)
                 nextMaxIndex = i;

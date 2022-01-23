@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import result.errors.NotFoundError;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -47,20 +48,23 @@ public class WidgetController {
             responseCode = "201", content = @Content(schema = @Schema(implementation = V1CreateWidgetResponse.class))),
         @ApiResponse(
             responseCode = "400", description = "BadRequest", content = @Content(
-                schema = @Schema(implementation = ValidationErrorResponse.class))),
+            schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
     public ResponseEntity<V1CreateWidgetResponse> v1Create(@RequestBody @Valid V1CreateWidgetRequest request) {
-        var createdWidget = widgetService.v1Create(mapper.v1CreateRequestToDto(request));
+        var createWidgetResult = widgetService.v1Create(mapper.v1CreateRequestToDto(request));
+
+        if (createWidgetResult.isFailed())
+            return ResponseEntity.internalServerError().build();
 
         var uri = ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
-            .buildAndExpand(createdWidget.getId())
+            .buildAndExpand(createWidgetResult.getValue().getId())
             .toUri();
 
         return ResponseEntity
             .created(uri)
-            .body(mapper.v1DtoToCreationResponse(createdWidget));
+            .body(mapper.v1DtoToCreationResponse(createWidgetResult.getValue()));
     }
 
     @GetMapping(path = "{id}")
@@ -68,15 +72,21 @@ public class WidgetController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200", content = @Content(schema = @Schema(implementation = V1GetWidgetByIdResponse.class))),
-        @ApiResponse(responseCode = "400", description = "BadRequest",  content = @Content(
+        @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content(
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
     public ResponseEntity<V1GetWidgetByIdResponse> v1GetById(@PathVariable @NotNull UUID id) {
-        var widget = widgetService.v1GetById(id);
+        var getWidgetResult = widgetService.v1GetById(id);
 
-        return ResponseEntity.ok(mapper.v1DtoToGetByIdResponse(widget));
+        if (getWidgetResult.hasError(NotFoundError.class))
+            return ResponseEntity.notFound().build();
+
+        if (getWidgetResult.isFailed())
+            return ResponseEntity.internalServerError().build();
+
+        return ResponseEntity.ok(mapper.v1DtoToGetByIdResponse(getWidgetResult.getValue()));
     }
 
     @GetMapping
@@ -85,14 +95,17 @@ public class WidgetController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200", content = @Content(schema = @Schema(implementation = V1GetAllWidgetsResponse.class))),
-        @ApiResponse(responseCode = "400", description = "BadRequest",  content = @Content(
+        @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content(
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
     public ResponseEntity<V1GetAllWidgetsResponse> v1GetAll() {
-        var widgets = widgetService.v1GetAll();
+        var getWidgetsResult = widgetService.v1GetAll();
 
-        return ResponseEntity.ok(new V1GetAllWidgetsResponse(widgets
+        if (getWidgetsResult.isFailed())
+            return ResponseEntity.internalServerError().build();
+
+        return ResponseEntity.ok(new V1GetAllWidgetsResponse(getWidgetsResult.getValue()
             .stream()
             .map(mapper::v1DtoToGetAllItem)
             .collect(toList())));
@@ -107,29 +120,41 @@ public class WidgetController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200", content = @Content(schema = @Schema(implementation = V1UpdateWidgetResponse.class))),
-        @ApiResponse(responseCode = "400", description = "BadRequest",  content = @Content(
+        @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content(
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
     public ResponseEntity<V1UpdateWidgetResponse> v1Update(
         @NotNull @PathVariable UUID id, @Valid @RequestBody V1UpdateWidgetRequest request) {
-        var updatedWidget = widgetService.v1Update(id, mapper.v1UpdateRequestToDto(request));
+        var updateWidgetResult = widgetService.v1Update(id, mapper.v1UpdateRequestToDto(request));
 
-        return ResponseEntity.ok(mapper.v1DtoToUpdatingResponse(updatedWidget));
+        if (updateWidgetResult.hasError(NotFoundError.class))
+            return ResponseEntity.notFound().build();
+
+        if (updateWidgetResult.isFailed())
+            return ResponseEntity.internalServerError().build();
+
+        return ResponseEntity.ok(mapper.v1DtoToUpdatingResponse(updateWidgetResult.getValue()));
     }
 
     @DeleteMapping(path = "{id}")
     @Operation(summary = "Deletes the widget by its ID", description = "Deletes the widget by its identifier")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
-        @ApiResponse(responseCode = "400", description = "BadRequest",  content = @Content(
+        @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content(
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
     public ResponseEntity<Void> v1Delete(@NotNull @PathVariable UUID id) {
-        widgetService.v1Delete(id);
+        var deleteWidgetResult = widgetService.v1Delete(id);
+
+        if (deleteWidgetResult.hasError(NotFoundError.class))
+            return ResponseEntity.notFound().build();
+
+        if (deleteWidgetResult.isFailed())
+            return ResponseEntity.internalServerError().build();
 
         return ResponseEntity.ok().build();
     }
