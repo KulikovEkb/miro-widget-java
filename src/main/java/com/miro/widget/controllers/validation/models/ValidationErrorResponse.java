@@ -1,4 +1,4 @@
-package com.miro.widget.controllers.validation;
+package com.miro.widget.controllers.validation.models;
 
 
 import lombok.Getter;

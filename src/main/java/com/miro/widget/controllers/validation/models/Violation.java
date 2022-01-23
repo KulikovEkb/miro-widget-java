@@ -1,4 +1,4 @@
-package com.miro.widget.controllers.validation;
+package com.miro.widget.controllers.validation.models;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

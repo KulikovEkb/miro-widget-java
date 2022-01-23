@@ -1,5 +1,7 @@
 package com.miro.widget.controllers.validation;
 
+import com.miro.widget.controllers.validation.models.ValidationErrorResponse;
+import com.miro.widget.controllers.validation.models.Violation;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

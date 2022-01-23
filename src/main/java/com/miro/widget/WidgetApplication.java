@@ -3,7 +3,6 @@ package com.miro.widget;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-// todo(kulikov): validation
 // todo(kulikov): results
 // todo(kulikov): tests
 // todo(kulikov): transactions

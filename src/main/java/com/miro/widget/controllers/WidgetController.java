@@ -2,7 +2,7 @@ package com.miro.widget.controllers;
 
 import com.miro.widget.controllers.models.requests.*;
 import com.miro.widget.controllers.models.responses.*;
-import com.miro.widget.controllers.validation.ValidationErrorResponse;
+import com.miro.widget.controllers.validation.models.ValidationErrorResponse;
 import com.miro.widget.mappers.WebAndBllMapper;
 import com.miro.widget.service.WidgetService;
 import io.swagger.v3.oas.annotations.Operation;
