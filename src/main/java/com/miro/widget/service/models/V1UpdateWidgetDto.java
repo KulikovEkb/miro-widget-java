@@ -1,12 +1,12 @@
-package com.miro.widget.services.models;
+package com.miro.widget.service.models;
 
 import lombok.Value;
 
 @Value
 public class V1UpdateWidgetDto {
-    Integer middleX;
+    Integer centerX;
 
-    Integer middleY;
+    Integer centerY;
 
     Integer zIndex;
 

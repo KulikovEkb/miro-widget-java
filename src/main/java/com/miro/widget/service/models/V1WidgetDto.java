@@ -1,4 +1,4 @@
-package com.miro.widget.services.models;
+package com.miro.widget.service.models;
 
 import lombok.NonNull;
 import lombok.Value;

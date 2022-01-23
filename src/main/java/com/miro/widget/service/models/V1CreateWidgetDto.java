@@ -1,4 +1,4 @@
-package com.miro.widget.services.models;
+package com.miro.widget.service.models;
 
 import lombok.NonNull;
 import lombok.Value;
@@ -6,10 +6,10 @@ import lombok.Value;
 @Value
 public class V1CreateWidgetDto {
     @NonNull
-    Integer middleX;
+    Integer centerX;
 
     @NonNull
-    Integer middleY;
+    Integer centerY;
 
     Integer zIndex;
 
