@@ -1,11 +1,9 @@
 package com.miro.widget.service.repositories;
 
-import com.miro.widget.service.models.V1CoordinatesDto;
-import com.miro.widget.service.models.V1SizeDto;
-import com.miro.widget.service.models.V1WidgetDto;
-import com.miro.widget.service.repositories.models.V1InsertWidgetModel;
-import com.miro.widget.service.repositories.models.V1UpdateWidgetModel;
-import com.miro.widget.service.repositories.models.V1WidgetEntity;
+import com.miro.widget.mappers.BllAndDalMapper;
+import com.miro.widget.service.models.*;
+import com.miro.widget.service.repositories.models.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.ZonedDateTime;
@@ -21,37 +19,23 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     private final ConcurrentMap<UUID, V1WidgetEntity> idToWidgetMap;
     private final ConcurrentMap<Integer, V1WidgetEntity> zIndexToWidgetMap;
 
-    public InMemoryRepositoryImpl() {
+    private final BllAndDalMapper mapper;
+
+    @Autowired
+    public InMemoryRepositoryImpl(BllAndDalMapper mapper) {
         idToWidgetMap = new ConcurrentHashMap<UUID, V1WidgetEntity>();
         zIndexToWidgetMap = new ConcurrentHashMap<Integer, V1WidgetEntity>();
+
+        this.mapper = mapper;
     }
 
     public V1WidgetDto v1Insert(V1InsertWidgetModel model) {
-        var widgetEntity = new V1WidgetEntity(
-            UUID.randomUUID(),
-            model.getZIndex(),
-            model.getCenterX(),
-            model.getCenterY(),
-            model.getWidth(),
-            model.getHeight(),
-            ZonedDateTime.now()
-        );
+        var widgetEntity = mapper.v1InsertModelToEntity(model);
 
         idToWidgetMap.put(widgetEntity.getId(), widgetEntity);
         zIndexToWidgetMap.put(widgetEntity.getZIndex(), widgetEntity);
 
-        return new V1WidgetDto(
-            widgetEntity.getId(),
-            widgetEntity.getZIndex(),
-            new V1CoordinatesDto(
-                widgetEntity.getCenterX(),
-                widgetEntity.getCenterY()
-            ),
-            new V1SizeDto(
-                widgetEntity.getWidth(),
-                widgetEntity.getHeight()
-            ),
-            widgetEntity.getUpdatedAt());
+        return mapper.v1EntityToDto(widgetEntity);
     }
 
     public V1WidgetDto v1GetById(UUID id) {
@@ -61,18 +45,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
         /*if (widget == null){
             return new Result(NotFoundError);*/
 
-        return new V1WidgetDto(
-            widgetEntity.getId(),
-            widgetEntity.getZIndex(),
-            new V1CoordinatesDto(
-                widgetEntity.getCenterX(),
-                widgetEntity.getCenterY()
-            ),
-            new V1SizeDto(
-                widgetEntity.getWidth(),
-                widgetEntity.getHeight()
-            ),
-            widgetEntity.getUpdatedAt());
+        return mapper.v1EntityToDto(widgetEntity);
     }
 
     public V1WidgetDto v1GetByZIndex(int zIndex) {
@@ -82,36 +55,14 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
         /*if (widget == null){
             return new Result(NotFoundError);*/
 
-        return new V1WidgetDto(
-            widgetEntity.getId(),
-            widgetEntity.getZIndex(),
-            new V1CoordinatesDto(
-                widgetEntity.getCenterX(),
-                widgetEntity.getCenterY()
-            ),
-            new V1SizeDto(
-                widgetEntity.getWidth(),
-                widgetEntity.getHeight()
-            ),
-            widgetEntity.getUpdatedAt());
+        return mapper.v1EntityToDto(widgetEntity);
     }
 
     public List<V1WidgetDto> v1GetAll() {
         return idToWidgetMap
             .values()
             .stream()
-            .map(widgetEntity -> new V1WidgetDto(
-                widgetEntity.getId(),
-                widgetEntity.getZIndex(),
-                new V1CoordinatesDto(
-                    widgetEntity.getCenterX(),
-                    widgetEntity.getCenterY()
-                ),
-                new V1SizeDto(
-                    widgetEntity.getWidth(),
-                    widgetEntity.getHeight()
-                ),
-                widgetEntity.getUpdatedAt()))
+            .map(mapper::v1EntityToDto)
             .sorted(Comparator.comparing(V1WidgetDto::getZIndex))
             .collect(Collectors.toList());
     }
@@ -142,18 +93,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
 
         widgetEntity.setUpdatedAt(ZonedDateTime.now());
 
-        return new V1WidgetDto(
-            widgetEntity.getId(),
-            widgetEntity.getZIndex(),
-            new V1CoordinatesDto(
-                widgetEntity.getCenterX(),
-                widgetEntity.getCenterY()
-            ),
-            new V1SizeDto(
-                widgetEntity.getWidth(),
-                widgetEntity.getHeight()
-            ),
-            widgetEntity.getUpdatedAt());
+        return mapper.v1EntityToDto(widgetEntity);
     }
 
     public void v1Delete(UUID id) {

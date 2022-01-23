@@ -4,9 +4,9 @@ import lombok.Value;
 
 @Value
 public class V1UpdateWidgetRequest {
-    Integer middleX;
+    Integer centerX;
 
-    Integer middleY;
+    Integer centerY;
 
     Integer zIndex;
 

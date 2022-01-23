@@ -6,10 +6,10 @@ import lombok.Value;
 @Value
 public class V1CreateWidgetRequest {
     @NonNull
-    Integer middleX;
+    Integer centerX;
 
     @NonNull
-    Integer middleY;
+    Integer centerY;
 
     Integer zIndex;
 
