@@ -1,10 +1,11 @@
 package com.miro.widget.service.repositories.models;
 
-import lombok.NonNull;
+import lombok.*;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+@Data
 public class V1WidgetEntity {
     @NonNull
     UUID id;
