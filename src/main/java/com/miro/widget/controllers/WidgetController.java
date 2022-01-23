@@ -2,6 +2,7 @@ package com.miro.widget.controllers;
 
 import com.miro.widget.controllers.models.requests.*;
 import com.miro.widget.controllers.models.responses.*;
+import com.miro.widget.controllers.validation.ValidationErrorResponse;
 import com.miro.widget.mappers.WebAndBllMapper;
 import com.miro.widget.service.WidgetService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,13 +13,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 import static java.util.stream.Collectors.toList;
 
+@Validated
 @RestController
 @RequestMapping(path = "api/v1/widgets", produces = MediaType.APPLICATION_JSON_VALUE)
 public class WidgetController {
@@ -32,19 +37,20 @@ public class WidgetController {
         this.widgetService = widgetService;
     }
 
-    // todo(kulikov): add error model to swagger
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Creates widget", description = "Having a set of coordinates, Z-index, width, and height, " +
+    @Operation(summary = "Creates a widget", description = "Having a set of coordinates, Z-index, width, and height, " +
         "we get a complete widget description in the response. The server generates the identifier. If a Z-index is " +
         "not specified, the widget moves to the foreground (becomes maximum). If the existing Z-index is specified, " +
         "then the new widget shifts widget with the same (and greater if needed) upwards")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "201", content = @Content(schema = @Schema(implementation = V1CreateWidgetResponse.class))),
-        @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content()),
+        @ApiResponse(
+            responseCode = "400", description = "BadRequest", content = @Content(
+                schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<V1CreateWidgetResponse> v1Create(@RequestBody V1CreateWidgetRequest request) {
+    public ResponseEntity<V1CreateWidgetResponse> v1Create(@RequestBody @Valid V1CreateWidgetRequest request) {
         var createdWidget = widgetService.v1Create(mapper.v1CreateRequestToDto(request));
 
         var uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -62,11 +68,12 @@ public class WidgetController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200", content = @Content(schema = @Schema(implementation = V1GetWidgetByIdResponse.class))),
-        @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content()),
+        @ApiResponse(responseCode = "400", description = "BadRequest",  content = @Content(
+            schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<V1GetWidgetByIdResponse> v1GetById(@PathVariable UUID id) {
+    public ResponseEntity<V1GetWidgetByIdResponse> v1GetById(@PathVariable @NotNull UUID id) {
         var widget = widgetService.v1GetById(id);
 
         return ResponseEntity.ok(mapper.v1DtoToGetByIdResponse(widget));
@@ -78,7 +85,8 @@ public class WidgetController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200", content = @Content(schema = @Schema(implementation = V1GetAllWidgetsResponse.class))),
-        @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content()),
+        @ApiResponse(responseCode = "400", description = "BadRequest",  content = @Content(
+            schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
     public ResponseEntity<V1GetAllWidgetsResponse> v1GetAll() {
@@ -99,12 +107,13 @@ public class WidgetController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200", content = @Content(schema = @Schema(implementation = V1UpdateWidgetResponse.class))),
-        @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content()),
+        @ApiResponse(responseCode = "400", description = "BadRequest",  content = @Content(
+            schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
     public ResponseEntity<V1UpdateWidgetResponse> v1Update(
-        @PathVariable UUID id, @RequestBody V1UpdateWidgetRequest request) {
+        @NotNull @PathVariable UUID id, @Valid @RequestBody V1UpdateWidgetRequest request) {
         var updatedWidget = widgetService.v1Update(id, mapper.v1UpdateRequestToDto(request));
 
         return ResponseEntity.ok(mapper.v1DtoToUpdatingResponse(updatedWidget));
@@ -114,11 +123,12 @@ public class WidgetController {
     @Operation(summary = "Deletes the widget by its ID", description = "Deletes the widget by its identifier")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK", content = @Content()),
-        @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content()),
+        @ApiResponse(responseCode = "400", description = "BadRequest",  content = @Content(
+            schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<Void> v1Delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> v1Delete(@NotNull @PathVariable UUID id) {
         widgetService.v1Delete(id);
 
         return ResponseEntity.ok().build();

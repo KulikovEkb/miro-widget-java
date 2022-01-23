@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 // todo(kulikov): validation
 // todo(kulikov): results
 // todo(kulikov): tests
-// todo(kulikov): swagger
 // todo(kulikov): transactions
 // todo(kulikov): H2
 // todo(kulikov): pagination

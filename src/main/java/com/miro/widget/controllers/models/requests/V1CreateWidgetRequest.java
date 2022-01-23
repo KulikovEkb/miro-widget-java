@@ -6,7 +6,6 @@ import lombok.Value;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 @Value
 public class V1CreateWidgetRequest {
@@ -38,7 +37,7 @@ public class V1CreateWidgetRequest {
     Integer z;
 
     @NotNull
-    @Positive
+    @Min(1)
     @Max(Integer.MAX_VALUE)
     @Schema(
         name = "width",
@@ -47,7 +46,7 @@ public class V1CreateWidgetRequest {
     Integer width;
 
     @NotNull
-    @Positive
+    @Min(1)
     @Max(Integer.MAX_VALUE)
     @Schema(
         name = "height",

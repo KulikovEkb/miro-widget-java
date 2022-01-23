@@ -6,7 +6,6 @@ import com.miro.widget.service.models.*;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-// https://mapstruct.org/documentation/stable/reference/html/#adding-custom-methods
 public abstract class WebAndBllMapper {
     public V1CreateWidgetDto v1CreateRequestToDto(V1CreateWidgetRequest request) {
         return new V1CreateWidgetDto(
