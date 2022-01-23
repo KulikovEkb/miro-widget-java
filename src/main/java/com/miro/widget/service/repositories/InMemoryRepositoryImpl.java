@@ -41,6 +41,8 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     public V1WidgetDto v1GetById(UUID id) {
         var widgetEntity = idToWidgetMap.getOrDefault(id, null);
 
+        if (widgetEntity == null)
+            return null;
         // todo(kulikov): uncomment
         /*if (widget == null){
             return new Result(NotFoundError);*/
@@ -51,6 +53,8 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     public V1WidgetDto v1GetByZIndex(int zIndex) {
         var widgetEntity = zIndexToWidgetMap.getOrDefault(zIndex, null);
 
+        if (widgetEntity == null)
+            return null;
         // todo(kulikov): uncomment
         /*if (widget == null){
             return new Result(NotFoundError);*/
@@ -70,6 +74,8 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     public V1WidgetDto v1Update(V1UpdateWidgetModel model) {
         var widgetEntity = idToWidgetMap.getOrDefault(model.getId(), null);
 
+        if (widgetEntity == null)
+            return null;
         // todo(kulikov): uncomment
         /*if (widget == null){
             return new Result(NotFoundError);*/
