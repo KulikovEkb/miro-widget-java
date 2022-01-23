@@ -33,7 +33,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
         var widgetEntity = mapper.v1InsertModelToEntity(model);
 
         idToWidgetMap.put(widgetEntity.getId(), widgetEntity);
-        zIndexToWidgetMap.put(widgetEntity.getZIndex(), widgetEntity);
+        zIndexToWidgetMap.put(widgetEntity.getZ(), widgetEntity);
 
         return mapper.v1EntityToDto(widgetEntity);
     }
@@ -50,8 +50,8 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
         return mapper.v1EntityToDto(widgetEntity);
     }
 
-    public V1WidgetDto v1GetByZIndex(int zIndex) {
-        var widgetEntity = zIndexToWidgetMap.getOrDefault(zIndex, null);
+    public V1WidgetDto v1GetByZIndex(int z) {
+        var widgetEntity = zIndexToWidgetMap.getOrDefault(z, null);
 
         if (widgetEntity == null)
             return null;
@@ -67,7 +67,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
             .values()
             .stream()
             .map(mapper::v1EntityToDto)
-            .sorted(Comparator.comparing(V1WidgetDto::getZIndex))
+            .sorted(Comparator.comparing(V1WidgetDto::getZ))
             .collect(Collectors.toList());
     }
 
@@ -92,9 +92,9 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
         if (model.getHeight() != null)
             widgetEntity.setHeight(model.getHeight());
 
-        if (model.getZIndex() != null) {
-            widgetEntity.setZIndex(model.getZIndex());
-            zIndexToWidgetMap.put(widgetEntity.getZIndex(), widgetEntity);
+        if (model.getZ() != null) {
+            widgetEntity.setZ(model.getZ());
+            zIndexToWidgetMap.put(widgetEntity.getZ(), widgetEntity);
         }
 
         widgetEntity.setUpdatedAt(ZonedDateTime.now());
@@ -104,7 +104,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
 
     public void v1Delete(UUID id) {
         var widgetEntity = idToWidgetMap.remove(id);
-        zIndexToWidgetMap.remove(widgetEntity.getZIndex());
+        zIndexToWidgetMap.remove(widgetEntity.getZ());
     }
 
     public void v1DeleteAll() {

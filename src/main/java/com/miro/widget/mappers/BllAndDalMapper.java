@@ -15,7 +15,7 @@ public abstract class BllAndDalMapper {
     public V1WidgetDto v1EntityToDto(V1WidgetEntity entity) {
         return new V1WidgetDto(
             entity.getId(),
-            entity.getZIndex(),
+            entity.getZ(),
             new V1CoordinatesDto(
                 entity.getCenterX(),
                 entity.getCenterY()
@@ -30,7 +30,7 @@ public abstract class BllAndDalMapper {
     public V1WidgetEntity v1InsertModelToEntity(V1InsertWidgetModel model) {
         return new V1WidgetEntity(
             UUID.randomUUID(),
-            model.getZIndex(),
+            model.getZ(),
             model.getCenterX(),
             model.getCenterY(),
             model.getWidth(),

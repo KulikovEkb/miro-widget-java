@@ -11,7 +11,7 @@ public class V1WidgetEntity {
     UUID id;
 
     @NonNull
-    Integer zIndex;
+    Integer z;
 
     @NonNull
     Integer centerX;

@@ -8,7 +8,7 @@ public class V1UpdateWidgetDto {
 
     Integer centerY;
 
-    Integer zIndex;
+    Integer z;
 
     Integer width;
 

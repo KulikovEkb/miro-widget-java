@@ -12,7 +12,7 @@ public class V1WidgetDto {
     UUID id;
 
     @NonNull
-    Integer zIndex;
+    Integer z;
 
     @NonNull
     V1CoordinatesDto coordinates;

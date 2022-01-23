@@ -10,7 +10,7 @@ public class V1UpdateWidgetModel {
     @NonNull
     UUID id;
 
-    Integer zIndex;
+    Integer z;
 
     Integer centerX;
 
@@ -20,9 +20,9 @@ public class V1UpdateWidgetModel {
 
     Integer height;
 
-    public V1UpdateWidgetModel(@NonNull UUID id, @NonNull Integer zIndex) {
+    public V1UpdateWidgetModel(@NonNull UUID id, @NonNull Integer z) {
         this.id = id;
-        this.zIndex = zIndex;
+        this.z = z;
     }
 }
 

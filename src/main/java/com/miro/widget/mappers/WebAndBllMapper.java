@@ -12,7 +12,7 @@ public abstract class WebAndBllMapper {
         return new V1CreateWidgetDto(
             request.getCenterX(),
             request.getCenterY(),
-            request.getZIndex(),
+            request.getZ(),
             request.getWidth(),
             request.getHeight()
         );
@@ -22,7 +22,7 @@ public abstract class WebAndBllMapper {
         return new V1UpdateWidgetDto(
             request.getCenterX(),
             request.getCenterY(),
-            request.getZIndex(),
+            request.getZ(),
             request.getWidth(),
             request.getHeight()
         );
@@ -31,7 +31,7 @@ public abstract class WebAndBllMapper {
     public V1CreateWidgetResponse v1DtoToCreationResponse(V1WidgetDto dto) {
         return new V1CreateWidgetResponse(
             dto.getId(),
-            dto.getZIndex(),
+            dto.getZ(),
             new V1Coordinates(
                 dto.getCoordinates().getCenterX(),
                 dto.getCoordinates().getCenterY()
@@ -47,7 +47,7 @@ public abstract class WebAndBllMapper {
     public V1UpdateWidgetResponse v1DtoToUpdatingResponse(V1WidgetDto dto) {
         return new V1UpdateWidgetResponse(
             dto.getId(),
-            dto.getZIndex(),
+            dto.getZ(),
             new V1Coordinates(
                 dto.getCoordinates().getCenterX(),
                 dto.getCoordinates().getCenterY()
@@ -63,7 +63,7 @@ public abstract class WebAndBllMapper {
     public V1GetWidgetByIdResponse v1DtoToGetByIdResponse(V1WidgetDto dto) {
         return new V1GetWidgetByIdResponse(
             dto.getId(),
-            dto.getZIndex(),
+            dto.getZ(),
             new V1Coordinates(
                 dto.getCoordinates().getCenterX(),
                 dto.getCoordinates().getCenterY()
@@ -79,7 +79,7 @@ public abstract class WebAndBllMapper {
     public V1GetAllWidgetsItem v1DtoToGetAllItem(V1WidgetDto dto) {
         return new V1GetAllWidgetsItem(
             dto.getId(),
-            dto.getZIndex(),
+            dto.getZ(),
             new V1Coordinates(
                 dto.getCoordinates().getCenterX(),
                 dto.getCoordinates().getCenterY()

@@ -6,7 +6,7 @@ import lombok.Value;
 @Value
 public class V1InsertWidgetModel {
     @NonNull
-    Integer zIndex;
+    Integer z;
 
     @NonNull
     Integer centerX;

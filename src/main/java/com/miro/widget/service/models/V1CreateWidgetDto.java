@@ -11,7 +11,7 @@ public class V1CreateWidgetDto {
     @NonNull
     Integer centerY;
 
-    Integer zIndex;
+    Integer z;
 
     @NonNull
     Integer width;

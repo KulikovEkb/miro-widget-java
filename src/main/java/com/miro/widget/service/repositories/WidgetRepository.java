@@ -12,7 +12,7 @@ public interface WidgetRepository {
 
     V1WidgetDto v1GetById(UUID id);
 
-    V1WidgetDto v1GetByZIndex(int zIndex);
+    V1WidgetDto v1GetByZIndex(int z);
 
     List<V1WidgetDto> v1GetAll();
 

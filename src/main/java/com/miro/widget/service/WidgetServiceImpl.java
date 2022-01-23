@@ -23,11 +23,11 @@ class WidgetServiceImpl implements WidgetService {
     }
 
     public V1WidgetDto v1Create(V1CreateWidgetDto dto) {
-        if (dto.getZIndex() != null)
-            shift(dto.getZIndex());
+        if (dto.getZ() != null)
+            shift(dto.getZ());
 
         return widgetRepository.v1Insert(new V1InsertWidgetModel(
-            dto.getZIndex() == null ? nextMaxIndex++ : dto.getZIndex(),
+            dto.getZ() == null ? nextMaxIndex++ : dto.getZ(),
             dto.getCenterX(),
             dto.getCenterY(),
             dto.getWidth(),
@@ -50,19 +50,19 @@ class WidgetServiceImpl implements WidgetService {
         //    var currentWidget = await _widgetRepository.V1GetById(dto.Id);
         //    await Shift(dto.ZIndex.Value, currentWidget.Value.ZIndex);
         //}
-        if (dto.getZIndex() != null) {
+        if (dto.getZ() != null) {
             var currentWidget = widgetRepository.v1GetById(id);
 
             widgetRepository.v1Delete(id);
 
-            shift(dto.getZIndex());
+            shift(dto.getZ());
 
             return widgetRepository.v1Update(new V1UpdateWidgetModel(
-                id, dto.getZIndex(), dto.getCenterX(), dto.getCenterY(), dto.getWidth(), dto.getHeight()));
+                id, dto.getZ(), dto.getCenterX(), dto.getCenterY(), dto.getWidth(), dto.getHeight()));
         }
 
         return widgetRepository.v1Update(new V1UpdateWidgetModel(
-            id, dto.getZIndex(), dto.getCenterX(), dto.getCenterY(), dto.getWidth(), dto.getHeight()));
+            id, dto.getZ(), dto.getCenterX(), dto.getCenterY(), dto.getWidth(), dto.getHeight()));
     }
 
     public void v1Delete(UUID id) {
