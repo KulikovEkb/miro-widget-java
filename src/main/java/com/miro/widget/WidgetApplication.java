@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 // todo(kulikov): H2
 // todo(kulikov): pagination
 // todo(kulikov): filtering
-// todo(kulikov): logging
 
 @SpringBootApplication
 public class WidgetApplication {

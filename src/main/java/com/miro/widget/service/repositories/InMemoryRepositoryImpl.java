@@ -3,6 +3,8 @@ package com.miro.widget.service.repositories;
 import com.miro.widget.mappers.BllAndDalMapper;
 import com.miro.widget.service.models.*;
 import com.miro.widget.service.repositories.models.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import result.PlainResult;
@@ -20,16 +22,16 @@ import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryRepositoryImpl implements WidgetRepository {
-    private final ConcurrentMap<UUID, V1WidgetEntity> idToWidgetMap;
-    private final ConcurrentMap<Integer, V1WidgetEntity> zIndexToWidgetMap;
+    private static final Logger log = LoggerFactory.getLogger(InMemoryRepositoryImpl.class);
+    private static final ConcurrentMap<UUID, V1WidgetEntity> idToWidgetMap =
+        new ConcurrentHashMap<UUID, V1WidgetEntity>();
+    private static final ConcurrentMap<Integer, V1WidgetEntity> zIndexToWidgetMap =
+        new ConcurrentHashMap<Integer, V1WidgetEntity>();
 
     private final BllAndDalMapper mapper;
 
     @Autowired
     public InMemoryRepositoryImpl(BllAndDalMapper mapper) {
-        idToWidgetMap = new ConcurrentHashMap<UUID, V1WidgetEntity>();
-        zIndexToWidgetMap = new ConcurrentHashMap<Integer, V1WidgetEntity>();
-
         this.mapper = mapper;
     }
 
@@ -41,6 +43,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
             zIndexToWidgetMap.put(widgetEntity.getZ(), widgetEntity);
         } catch (Exception exc) {
             var error = String.format("Failed to insert widget %s: %s", model, exc.getMessage());
+            log.error(error);
             return Result.Fail(new Error(error));
         }
 
@@ -50,8 +53,11 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     public Result<V1WidgetDto> v1GetById(UUID id) {
         var widgetEntity = idToWidgetMap.getOrDefault(id, null);
 
-        if (widgetEntity == null)
-            return Result.Fail(new NotFoundError(String.format("Widget with id '%s' not found", id)));
+        if (widgetEntity == null) {
+            var error = String.format("Widget with id '%s' not found", id);
+            log.error(error);
+            return Result.Fail(new NotFoundError(error));
+        }
 
         return Result.Ok(mapper.v1EntityToDto(widgetEntity));
     }
@@ -59,8 +65,11 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     public Result<V1WidgetDto> v1GetByZIndex(int z) {
         var widgetEntity = zIndexToWidgetMap.getOrDefault(z, null);
 
-        if (widgetEntity == null)
-            return Result.Fail(new NotFoundError(String.format("widget with z index '%d' not found", z)));
+        if (widgetEntity == null) {
+            var error = String.format("widget with z index '%d' not found", z);
+            log.error(error);
+            return Result.Fail(new NotFoundError(error));
+        }
 
         return Result.Ok(mapper.v1EntityToDto(widgetEntity));
     }
@@ -75,6 +84,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
                 .collect(Collectors.toList()));
         } catch (Exception exc) {
             var error = String.format("Failed to retrieve all widgets: %s", exc.getMessage());
+            log.error(error);
             return Result.Fail(new Error(error));
         }
     }
@@ -82,8 +92,11 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     public Result<V1WidgetDto> v1Update(V1UpdateWidgetModel model) {
         var widgetEntity = idToWidgetMap.getOrDefault(model.getId(), null);
 
-        if (widgetEntity == null)
-            return Result.Fail(new NotFoundError(String.format("Widget with id '%s' not found", model.getId())));
+        if (widgetEntity == null) {
+            var error = String.format("Widget with id '%s' not found", model.getId());
+            log.error(error);
+            return Result.Fail(new NotFoundError(error));
+        }
 
         if (model.getCenterX() != null)
             widgetEntity.setCenterX(model.getCenterX());
@@ -109,21 +122,27 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
 
     public PlainResult v1Delete(UUID id) {
         var removedByIdWidget = idToWidgetMap.remove(id);
-        if (removedByIdWidget == null)
-            return PlainResult.Fail(new NotFoundError(String.format("Widget with id '%s' not found", id)));
+        if (removedByIdWidget == null) {
+            var error = String.format("Widget with id '%s' not found", id);
+            log.error(error);
+            return PlainResult.Fail(new NotFoundError(error));
+        }
 
         var removedByZIndexWidget = zIndexToWidgetMap.remove(removedByIdWidget.getZ());
         if (removedByZIndexWidget == null) {
             var error = String.format(
                 "Widget with z index '%d' wasn't found while one with ID '%s' was", removedByIdWidget.getZ(), id);
+            log.error(error);
             return PlainResult.Fail(new Error(error));
         }
 
         if (!removedByIdWidget.equals(removedByZIndexWidget)) {
-            return PlainResult.Fail(new Error(String.format(
+            var error = String.format(
                 "Widget deleted by ID is not the same as deleted by z index. First: %s, second: %s",
                 removedByIdWidget,
-                removedByZIndexWidget)));
+                removedByZIndexWidget);
+            log.error(error);
+            return PlainResult.Fail(new Error(error));
         }
 
         return PlainResult.Ok();
@@ -135,6 +154,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
             zIndexToWidgetMap.clear();
         } catch (Exception exc) {
             var error = String.format("Failed to delete all widgets: %s", exc.getMessage());
+            log.error(error);
             return PlainResult.Fail(new Error(error));
         }
 
