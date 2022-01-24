@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import result.PlainResult;
 import result.Result;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,21 +47,17 @@ class WidgetServiceImpl implements WidgetService {
     }
 
     public Result<V1WidgetDto> v1Update(UUID id, V1UpdateWidgetDto dto) {
-        // todo(kulikov): fix that
-        /*if (dto.ZIndex.HasValue)
-        {
-            var currentWidget = await _widgetRepository.V1GetById(dto.Id);
-            await Shift(dto.ZIndex.Value, currentWidget.Value.ZIndex);
-        }*/
         if (dto.getZ() != null) {
-            var currentWidget = widgetRepository.v1GetById(id);
+            var getCurrentWidgetResult = widgetRepository.v1GetById(id);
 
-            widgetRepository.v1Delete(id);
+            if (getCurrentWidgetResult.isFailed())
+                return getCurrentWidgetResult;
 
-            shift(dto.getZ());
-
-            return widgetRepository.v1Update(new V1UpdateWidgetModel(
-                id, dto.getZ(), dto.getCenterX(), dto.getCenterY(), dto.getWidth(), dto.getHeight()));
+            if (getCurrentWidgetResult.getValue().getZ() > dto.getZ())
+                shift(dto.getZ(), getCurrentWidgetResult.getValue().getZ());
+            else {
+                shift(dto.getZ());
+            }
         }
 
         return widgetRepository.v1Update(new V1UpdateWidgetModel(

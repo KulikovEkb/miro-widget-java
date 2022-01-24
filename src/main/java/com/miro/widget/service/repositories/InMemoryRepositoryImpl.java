@@ -111,6 +111,10 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
             widgetEntity.setHeight(model.getHeight());
 
         if (model.getZ() != null) {
+            if (zIndexToWidgetMap.get(widgetEntity.getZ()).getId() == widgetEntity.getId()) {
+                zIndexToWidgetMap.remove(widgetEntity.getZ());
+            }
+
             widgetEntity.setZ(model.getZ());
             zIndexToWidgetMap.put(widgetEntity.getZ(), widgetEntity);
         }
