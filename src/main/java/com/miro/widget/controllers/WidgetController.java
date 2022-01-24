@@ -51,11 +51,11 @@ public class WidgetController {
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<V1CreateWidgetResponse> v1Create(@RequestBody @Valid V1CreateWidgetRequest request) {
+    public ResponseEntity<?> v1Create(@RequestBody @NotNull @Valid V1CreateWidgetRequest request) {
         var createWidgetResult = widgetService.v1Create(mapper.v1CreateRequestToDto(request));
 
         if (createWidgetResult.isFailed())
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(createWidgetResult.getError());
 
         var uri = ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
@@ -77,14 +77,14 @@ public class WidgetController {
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<V1GetWidgetByIdResponse> v1GetById(@PathVariable @NotNull UUID id) {
+    public ResponseEntity<?> v1GetById(@PathVariable @NotNull UUID id) {
         var getWidgetResult = widgetService.v1GetById(id);
 
         if (getWidgetResult.hasError(NotFoundError.class))
             return ResponseEntity.notFound().build();
 
         if (getWidgetResult.isFailed())
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(getWidgetResult.getError());
 
         return ResponseEntity.ok(mapper.v1DtoToGetByIdResponse(getWidgetResult.getValue()));
     }
@@ -99,11 +99,11 @@ public class WidgetController {
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<V1GetAllWidgetsResponse> v1GetAll() {
+    public ResponseEntity<?> v1GetAll() {
         var getWidgetsResult = widgetService.v1GetAll();
 
         if (getWidgetsResult.isFailed())
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(getWidgetsResult.getError());
 
         return ResponseEntity.ok(new V1GetAllWidgetsResponse(getWidgetsResult.getValue()
             .stream()
@@ -125,15 +125,23 @@ public class WidgetController {
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<V1UpdateWidgetResponse> v1Update(
-        @NotNull @PathVariable UUID id, @Valid @RequestBody V1UpdateWidgetRequest request) {
+    public ResponseEntity<?> v1Update(
+        @NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody V1UpdateWidgetRequest request) {
         var updateWidgetResult = widgetService.v1Update(id, mapper.v1UpdateRequestToDto(request));
+
+        if (request.getCenterX() == null &&
+            request.getCenterY() == null &&
+            request.getWidth() == null &&
+            request.getHeight() == null &&
+            request.getZ() == null) {
+            return ResponseEntity.badRequest().body("There is nothing to update according to the request");
+        }
 
         if (updateWidgetResult.hasError(NotFoundError.class))
             return ResponseEntity.notFound().build();
 
         if (updateWidgetResult.isFailed())
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(updateWidgetResult.getError());
 
         return ResponseEntity.ok(mapper.v1DtoToUpdatingResponse(updateWidgetResult.getValue()));
     }
@@ -147,14 +155,14 @@ public class WidgetController {
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<Void> v1Delete(@NotNull @PathVariable UUID id) {
+    public ResponseEntity<?> v1Delete(@NotNull @PathVariable UUID id) {
         var deleteWidgetResult = widgetService.v1Delete(id);
 
         if (deleteWidgetResult.hasError(NotFoundError.class))
             return ResponseEntity.notFound().build();
 
         if (deleteWidgetResult.isFailed())
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(deleteWidgetResult.getError());
 
         return ResponseEntity.ok().build();
     }

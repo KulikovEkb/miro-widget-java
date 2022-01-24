@@ -1,9 +1,11 @@
 package result;
 
+import lombok.Getter;
 import result.errors.Error;
 
 public class PlainResult {
     private final Boolean isSucceed;
+    @Getter
     private final Error error;
 
     public Boolean isSucceed() {

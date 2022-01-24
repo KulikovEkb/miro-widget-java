@@ -7,6 +7,7 @@ public class Result<T>{
     private final Boolean isSucceed;
     @Getter
     private final T value;
+    @Getter
     private final Error error;
 
     public Boolean isSucceed() {

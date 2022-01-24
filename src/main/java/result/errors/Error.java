@@ -2,8 +2,10 @@ package result.errors;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 @AllArgsConstructor
+@Getter
 public class Error {
-    private String message;
+    private final String message;
 }
