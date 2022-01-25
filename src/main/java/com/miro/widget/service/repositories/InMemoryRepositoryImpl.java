@@ -18,13 +18,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryRepositoryImpl implements WidgetRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryRepositoryImpl.class);
     private static final ConcurrentMap<UUID, V1WidgetEntity> idToWidgetMap = new ConcurrentHashMap<>();
-    private static final ConcurrentMap<Integer, V1WidgetEntity> zIndexToWidgetMap = new ConcurrentHashMap<>();
+    private static final ConcurrentNavigableMap<Integer, V1WidgetEntity> zIndexToWidgetMap =
+        new ConcurrentSkipListMap<>();
 
     private final BllAndDalMapper mapper;
 
@@ -74,11 +77,10 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
 
     public Result<List<V1WidgetDto>> v1GetAll() {
         try {
-            return Result.Ok(idToWidgetMap
+            return Result.Ok(zIndexToWidgetMap
                 .values()
                 .stream()
                 .map(mapper::v1EntityToDto)
-                .sorted(Comparator.comparing(V1WidgetDto::getZ))
                 .collect(Collectors.toList()));
         } catch (Exception exc) {
             var message = String.format("Failed to retrieve all widgets: %s", exc.getMessage());

@@ -6,6 +6,7 @@ import com.miro.widget.service.models.V1WidgetDto;
 import com.miro.widget.service.repositories.WidgetRepository;
 import com.miro.widget.service.repositories.models.V1InsertWidgetModel;
 import com.miro.widget.service.repositories.models.V1UpdateWidgetModel;
+import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import result.PlainResult;
@@ -25,6 +26,7 @@ public class WidgetServiceImpl implements WidgetService {
         this.widgetRepository = widgetRepository;
     }
 
+    @Synchronized
     public Result<V1WidgetDto> v1Create(V1CreateWidgetDto dto) {
         if (nextMaxIndex == Integer.MAX_VALUE)
             return Result.Fail(new Error("Max available Z index value reached"));
@@ -48,14 +50,17 @@ public class WidgetServiceImpl implements WidgetService {
         ));
     }
 
+    @Synchronized
     public Result<V1WidgetDto> v1GetById(UUID id) {
         return widgetRepository.v1GetById(id);
     }
 
+    @Synchronized
     public Result<List<V1WidgetDto>> v1GetAll() {
         return widgetRepository.v1GetAll();
     }
 
+    @Synchronized
     public Result<V1WidgetDto> v1Update(UUID id, V1UpdateWidgetDto dto) {
         if (dto.getZ() != null) {
             if (dto.getZ() == Integer.MAX_VALUE)
@@ -80,6 +85,7 @@ public class WidgetServiceImpl implements WidgetService {
             id, dto.getZ(), dto.getCenterX(), dto.getCenterY(), dto.getWidth(), dto.getHeight()));
     }
 
+    @Synchronized
     public PlainResult v1Delete(UUID id) {
         return widgetRepository.v1Delete(id);
     }
