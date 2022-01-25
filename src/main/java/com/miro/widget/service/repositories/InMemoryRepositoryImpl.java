@@ -23,10 +23,8 @@ import java.util.stream.Collectors;
 @Repository
 public class InMemoryRepositoryImpl implements WidgetRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryRepositoryImpl.class);
-    private static final ConcurrentMap<UUID, V1WidgetEntity> idToWidgetMap =
-        new ConcurrentHashMap<UUID, V1WidgetEntity>();
-    private static final ConcurrentMap<Integer, V1WidgetEntity> zIndexToWidgetMap =
-        new ConcurrentHashMap<Integer, V1WidgetEntity>();
+    private static final ConcurrentMap<UUID, V1WidgetEntity> idToWidgetMap = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Integer, V1WidgetEntity> zIndexToWidgetMap = new ConcurrentHashMap<>();
 
     private final BllAndDalMapper mapper;
 
@@ -36,18 +34,18 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     }
 
     public Result<V1WidgetDto> v1Insert(V1InsertWidgetModel model) {
-        var widgetEntity = mapper.v1InsertModelToEntity(model);
-
         try {
+            var widgetEntity = mapper.v1InsertModelToEntity(model);
+
             idToWidgetMap.put(widgetEntity.getId(), widgetEntity);
             zIndexToWidgetMap.put(widgetEntity.getZ(), widgetEntity);
+
+            return Result.Ok(mapper.v1EntityToDto(widgetEntity));
         } catch (Exception exc) {
             var message = String.format("Failed to insert widget %s: %s", model, exc.getMessage());
             log.error(message);
             return Result.Fail(new Error(message));
         }
-
-        return Result.Ok(mapper.v1EntityToDto(widgetEntity));
     }
 
     public Result<V1WidgetDto> v1GetById(UUID id) {
@@ -66,7 +64,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
         var widgetEntity = zIndexToWidgetMap.getOrDefault(z, null);
 
         if (widgetEntity == null) {
-            var message = String.format("widget with z index '%d' not found", z);
+            var message = String.format("Widget with z index '%d' not found", z);
             log.warn(message);
             return Result.Fail(new NotFoundError(message));
         }

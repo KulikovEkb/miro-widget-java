@@ -32,8 +32,7 @@ public class WidgetController {
     private final WidgetService widgetService;
 
     @Autowired
-    public WidgetController(
-        WebAndBllMapper mapper, WidgetService widgetService) {
+    public WidgetController(WebAndBllMapper mapper, WidgetService widgetService) {
         this.mapper = mapper;
         this.widgetService = widgetService;
     }
