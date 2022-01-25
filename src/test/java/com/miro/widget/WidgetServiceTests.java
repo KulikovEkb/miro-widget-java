@@ -247,7 +247,7 @@ public class WidgetServiceTests {
     private static V1WidgetDto generateV1WidgetDto() {
         return new V1WidgetDto(
             UUID.randomUUID(),
-            RandomUtils.nextInt(),
+            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
             new V1CoordinatesDto(RandomUtils.nextInt(), RandomUtils.nextInt()),
             new V1SizeDto(RandomUtils.nextInt(1, Integer.MAX_VALUE), RandomUtils.nextInt(1, Integer.MAX_VALUE)),
             ZonedDateTime.now());
@@ -266,7 +266,7 @@ public class WidgetServiceTests {
         return new V1UpdateWidgetDto(
             RandomUtils.nextInt(),
             RandomUtils.nextInt(),
-            RandomUtils.nextInt(),
+            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
             RandomUtils.nextInt(1, Integer.MAX_VALUE),
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }

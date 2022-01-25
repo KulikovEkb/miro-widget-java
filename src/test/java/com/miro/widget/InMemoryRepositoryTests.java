@@ -194,7 +194,7 @@ public class InMemoryRepositoryTests {
 
     private static V1InsertWidgetModel generateV1InsertWidgetModel() {
         return new V1InsertWidgetModel(
-            RandomUtils.nextInt(),
+            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
             RandomUtils.nextInt(),
             RandomUtils.nextInt(),
             RandomUtils.nextInt(1, Integer.MAX_VALUE),
@@ -204,7 +204,7 @@ public class InMemoryRepositoryTests {
     private static V1UpdateWidgetModel generateV1UpdateWidgetModel(UUID id) {
         return new V1UpdateWidgetModel(
             id,
-            RandomUtils.nextInt(),
+            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
             RandomUtils.nextInt(),
             RandomUtils.nextInt(),
             RandomUtils.nextInt(1, Integer.MAX_VALUE),
