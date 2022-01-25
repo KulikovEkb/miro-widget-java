@@ -28,7 +28,7 @@ public class V1CreateWidgetRequest {
     Integer centerY;
 
     @Min(Integer.MIN_VALUE)
-    @Max(Integer.MAX_VALUE)
+    @Max(Integer.MAX_VALUE - 1)
     @Schema(
         name = "z",
         example = "10",

@@ -34,7 +34,7 @@ public class PlainResult {
         return new PlainResult(error);
     }
 
-    public <E> boolean hasError(Class<E> classType) {
+    public <E extends Error> boolean hasError(Class<E> classType) {
         return classType.isInstance(error);
     }
 }

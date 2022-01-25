@@ -10,24 +10,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import result.PlainResult;
 import result.Result;
+import result.errors.Error;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-class WidgetServiceImpl implements WidgetService {
+public class WidgetServiceImpl implements WidgetService {
     private static int nextMaxIndex;
     private final WidgetRepository widgetRepository;
 
     @Autowired
-    WidgetServiceImpl(WidgetRepository widgetRepository) {
+    public WidgetServiceImpl(WidgetRepository widgetRepository) {
         this.widgetRepository = widgetRepository;
     }
 
     public Result<V1WidgetDto> v1Create(V1CreateWidgetDto dto) {
-        if (dto.getZ() != null)
+        if (nextMaxIndex == Integer.MAX_VALUE)
+            return Result.Fail(new Error("Max available Z index value reached"));
+
+        if (dto.getZ() != null) {
+            if (dto.getZ() == Integer.MAX_VALUE)
+                return Result.Fail(new Error("Z index value is too big"));
+
             shift(dto.getZ());
+
+            if (dto.getZ() >= nextMaxIndex)
+                nextMaxIndex = dto.getZ() + 1;
+        }
 
         return widgetRepository.v1Insert(new V1InsertWidgetModel(
             dto.getZ() == null ? nextMaxIndex++ : dto.getZ(),
@@ -48,6 +58,9 @@ class WidgetServiceImpl implements WidgetService {
 
     public Result<V1WidgetDto> v1Update(UUID id, V1UpdateWidgetDto dto) {
         if (dto.getZ() != null) {
+            if (dto.getZ() == Integer.MAX_VALUE)
+                return Result.Fail(new Error("Z index value is too big"));
+
             var getCurrentWidgetResult = widgetRepository.v1GetById(id);
 
             if (getCurrentWidgetResult.isFailed())
@@ -58,6 +71,9 @@ class WidgetServiceImpl implements WidgetService {
             else {
                 shift(dto.getZ());
             }
+
+            if (dto.getZ() >= nextMaxIndex)
+                nextMaxIndex = dto.getZ() + 1;
         }
 
         return widgetRepository.v1Update(new V1UpdateWidgetModel(
@@ -69,7 +85,7 @@ class WidgetServiceImpl implements WidgetService {
     }
 
     void shift(int startIndex) {
-        this.shift(startIndex, Integer.MAX_VALUE);
+        this.shift(startIndex, Integer.MAX_VALUE - 1);
     }
 
     void shift(int startIndex, int endIndex) {

@@ -5,7 +5,6 @@ import lombok.Value;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Positive;
 
 @Value
 public class V1UpdateWidgetRequest {
@@ -26,7 +25,7 @@ public class V1UpdateWidgetRequest {
     Integer centerY;
 
     @Min(Integer.MIN_VALUE)
-    @Max(Integer.MAX_VALUE)
+    @Max(Integer.MAX_VALUE - 1)
     @Schema(
         name = "z",
         example = "10",
@@ -34,7 +33,7 @@ public class V1UpdateWidgetRequest {
             "(regardless of their coordinates)")
     Integer z;
 
-    @Positive
+    @Min(1)
     @Max(Integer.MAX_VALUE)
     @Schema(
         name = "width",
@@ -42,7 +41,7 @@ public class V1UpdateWidgetRequest {
         description = "width of the widget")
     Integer width;
 
-    @Positive
+    @Min(1)
     @Max(Integer.MAX_VALUE)
     @Schema(
         name = "height",

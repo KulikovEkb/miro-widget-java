@@ -62,12 +62,12 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_successfully_get_by_ID() {
-        var insertionResult = widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
 
-        var getByIdResult = widgetRepository.v1GetById(insertionResult.getValue().getId());
+        var getByIdResult = widgetRepository.v1GetById(insertedWidget.getId());
 
         assertTrue(getByIdResult.isSucceed());
-        assertThat(getByIdResult.getValue()).usingRecursiveComparison().isEqualTo(insertionResult.getValue());
+        assertThat(getByIdResult.getValue()).usingRecursiveComparison().isEqualTo(insertedWidget);
     }
 
     @Test
@@ -82,12 +82,12 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_successfully_get_by_Z_index() {
-        var insertionResult = widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
 
-        var getByZIndexResult = widgetRepository.v1GetByZIndex(insertionResult.getValue().getZ());
+        var getByZIndexResult = widgetRepository.v1GetByZIndex(insertedWidget.getZ());
 
         assertTrue(getByZIndexResult.isSucceed());
-        assertThat(getByZIndexResult.getValue()).usingRecursiveComparison().isEqualTo(insertionResult.getValue());
+        assertThat(getByZIndexResult.getValue()).usingRecursiveComparison().isEqualTo(insertedWidget);
     }
 
     @Test
@@ -102,41 +102,37 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_successfully_get_all_inserted_widgets() {
-        var insertionResult = widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
 
         var getAllResult = widgetRepository.v1GetAll();
 
         assertTrue(getAllResult.isSucceed());
         assertThat(getAllResult.getValue().size()).isEqualTo(1);
-        assertThat(getAllResult.getValue().get(0)).usingRecursiveComparison().isEqualTo(insertionResult.getValue());
+        assertThat(getAllResult.getValue().get(0)).usingRecursiveComparison().isEqualTo(insertedWidget);
     }
 
     @Test
     public void should_successfully_update() {
-        var insertionResult = widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
 
-        var updatingModel = generateV1UpdateWidgetModel(insertionResult.getValue().getId());
+        var updatingModel = generateV1UpdateWidgetModel(insertedWidget.getId());
         var updatingResult = widgetRepository.v1Update(updatingModel);
 
         assertTrue(updatingResult.isSucceed());
-        assertThat(updatingResult.getValue().getId()).isEqualTo(insertionResult.getValue().getId());
+        assertThat(updatingResult.getValue().getId()).isEqualTo(insertedWidget.getId());
         assertEquals(updatingResult.getValue().getZ(), updatingModel.getZ());
         assertEquals(updatingResult.getValue().getCoordinates().getCenterX(), updatingModel.getCenterX());
         assertEquals(updatingResult.getValue().getCoordinates().getCenterY(), updatingModel.getCenterY());
         assertEquals(updatingResult.getValue().getSize().getWidth(), updatingModel.getWidth());
         assertEquals(updatingResult.getValue().getSize().getHeight(), updatingModel.getHeight());
 
-        assertNotEquals(updatingResult.getValue().getZ(), insertionResult.getValue().getZ());
+        assertNotEquals(updatingResult.getValue().getZ(), insertedWidget.getZ());
         assertNotEquals(
-            updatingResult.getValue().getCoordinates().getCenterX(),
-            insertionResult.getValue().getCoordinates().getCenterX());
+            updatingResult.getValue().getCoordinates().getCenterX(), insertedWidget.getCoordinates().getCenterX());
         assertNotEquals(
-            updatingResult.getValue().getCoordinates().getCenterY(),
-            insertionResult.getValue().getCoordinates().getCenterY());
-        assertNotEquals(
-            updatingResult.getValue().getSize().getWidth(), insertionResult.getValue().getSize().getWidth());
-        assertNotEquals(
-            updatingResult.getValue().getSize().getHeight(), insertionResult.getValue().getSize().getHeight());
+            updatingResult.getValue().getCoordinates().getCenterY(), insertedWidget.getCoordinates().getCenterY());
+        assertNotEquals(updatingResult.getValue().getSize().getWidth(), insertedWidget.getSize().getWidth());
+        assertNotEquals(updatingResult.getValue().getSize().getHeight(), insertedWidget.getSize().getHeight());
 
         assertThat(updatingResult.getValue())
             .usingRecursiveComparison()
@@ -162,9 +158,9 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_successfully_delete_by_ID() {
-        var insertionResult = widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
 
-        var deletingResult = widgetRepository.v1Delete(insertionResult.getValue().getId());
+        var deletingResult = widgetRepository.v1Delete(insertedWidget.getId());
 
         var getAllResult = widgetRepository.v1GetAll();
 
