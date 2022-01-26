@@ -23,6 +23,7 @@ public class WidgetServiceImpl implements WidgetService {
 
     @Autowired
     public WidgetServiceImpl(WidgetRepository widgetRepository) {
+        nextMaxIndex = 0;
         this.widgetRepository = widgetRepository;
     }
 

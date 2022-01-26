@@ -1,7 +1,6 @@
 package com.miro.widget.service;
 
 import com.miro.widget.service.models.*;
-import com.miro.widget.service.models.V1WidgetRangeDto;
 import result.PlainResult;
 import result.Result;
 

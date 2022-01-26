@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class WidgetServiceTests {
@@ -49,8 +49,8 @@ public class WidgetServiceTests {
         assertTrue(creationResult.isSucceed());
         assertThat(creationResult.getValue()).usingRecursiveComparison().isEqualTo(widgetDto);
 
-        /*verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
-        verify(widgetRepository, times(1)).v1Insert(argThat(x -> x.getZ().equals(creationDto.getZ())));*/
+        verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
+        verify(widgetRepository, times(1)).v1Insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
     }
 
     @Test
@@ -67,8 +67,8 @@ public class WidgetServiceTests {
         assertTrue(creationResult.isFailed());
         assertNull(creationResult.getValue());
 
-        /*verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
-        verify(widgetRepository, times(1)).v1Insert(argThat(x -> x.getZ().equals(creationDto.getZ())));*/
+        verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
+        verify(widgetRepository, times(1)).v1Insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
     }
 
     @Test
@@ -88,8 +88,8 @@ public class WidgetServiceTests {
         assertNull(creationResult.getValue());
         assertThat(creationResult.getError().getMessage()).isEqualTo("Max available Z index value reached");
 
-        /*verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
-        verify(widgetRepository, times(1)).v1Insert(argThat(x -> x.getZ().equals(creationDto.getZ())));*/
+        verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
+        verify(widgetRepository, times(1)).v1Insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
     }
 
     @Test
@@ -103,7 +103,7 @@ public class WidgetServiceTests {
         assertTrue(getByIdResult.isSucceed());
         assertThat(getByIdResult.getValue()).usingRecursiveComparison().isEqualTo(widgetDto);
 
-        //verify(widgetRepository, times(1)).v1GetById(widgetDto.getId());
+        verify(widgetRepository, times(1)).v1GetById(widgetDto.getId());
     }
 
     @Test
@@ -117,7 +117,7 @@ public class WidgetServiceTests {
         assertTrue(getByIdResult.isFailed());
         assertNull(getByIdResult.getValue());
 
-        //verify(widgetRepository, times(1)).v1GetById(widgetId);
+        verify(widgetRepository, times(1)).v1GetById(widgetId);
     }
 
     @Test
@@ -132,7 +132,7 @@ public class WidgetServiceTests {
         assertThat(getAllResult.getValue().getWidgets().size()).isEqualTo(1);
         assertThat(getAllResult.getValue().getWidgets().get(0)).usingRecursiveComparison().isEqualTo(widgetDto);
 
-        //verify(widgetRepository, times(1)).v1GetAll();
+        verify(widgetRepository, times(1)).v1GetRange(1, 1);
     }
 
     @Test
@@ -159,11 +159,11 @@ public class WidgetServiceTests {
         assertTrue(updatingResult.isSucceed());
         assertThat(updatingResult.getValue()).usingRecursiveComparison().isEqualTo(updatedWidget);
 
-        /*verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
+        verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
         verify(widgetRepository, times(1)).v1GetByZIndex(updatingDto.getZ());
         verify(widgetRepository, times(1)).v1Insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
         verify(widgetRepository, times(1)).v1GetById(createdWidget.getId());
-        verify(widgetRepository, times(1)).v1Update(argThat(x -> x.getId().equals(createdWidget.getId())));*/
+        verify(widgetRepository, times(1)).v1Update(argThat(x -> x.getId().equals(createdWidget.getId())));
     }
 
     @Test
@@ -187,9 +187,9 @@ public class WidgetServiceTests {
         assertNull(updatingResult.getValue());
         assertThat(updatingResult.getError().getMessage()).isEqualTo("updating error");
 
-        /*verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
+        verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
         verify(widgetRepository, times(1)).v1Insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
-        verify(widgetRepository, times(1)).v1Update(argThat(x -> x.getId().equals(createdWidget.getId())));*/
+        verify(widgetRepository, times(1)).v1Update(argThat(x -> x.getId().equals(createdWidget.getId())));
     }
 
     @Test
@@ -202,7 +202,7 @@ public class WidgetServiceTests {
 
         assertTrue(deletingResult.isSucceed());
 
-        //verify(widgetRepository, times(1)).v1Delete(widgetId);
+        verify(widgetRepository, times(1)).v1Delete(widgetId);
     }
 
     @Test
@@ -216,6 +216,6 @@ public class WidgetServiceTests {
         assertTrue(deletingResult.isFailed());
         assertThat(deletingResult.getError().getMessage()).isEqualTo("deleting error");
 
-        //verify(widgetRepository, times(1)).v1Delete(widgetId);
+        verify(widgetRepository, times(1)).v1Delete(widgetId);
     }
 }
