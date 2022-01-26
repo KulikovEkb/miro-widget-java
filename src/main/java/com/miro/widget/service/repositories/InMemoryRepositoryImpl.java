@@ -77,6 +77,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
         try {
             var valuesCount = zIndexToWidgetMap.values().size();
             var pagesCount = valuesCount / size;
+
             if (pagesCount * size < valuesCount)
                 pagesCount++;
 
@@ -91,13 +92,6 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
                     .map(mapper::v1EntityToDto)
                     .collect(Collectors.toList())
             ));
-            /*return Result.Ok(zIndexToWidgetMap
-                .values()
-                .stream()
-                .skip((long) (page - 1) * size)
-                .limit(size)
-                .map(mapper::v1EntityToDto)
-                .collect(Collectors.toList()));*/
         } catch (Exception exc) {
             var message = String.format("Failed to retrieve all widgets: %s", exc.getMessage());
             log.error(message);
