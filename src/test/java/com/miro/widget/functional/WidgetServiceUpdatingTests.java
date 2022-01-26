@@ -42,8 +42,7 @@ public class WidgetServiceUpdatingTests {
         var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
         var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetDto = new V1UpdateWidgetDto(null, null, 0, null, null);
-        var updateWidgetResult = widgetService.v1Update(thirdWidget.getId(), updateWidgetDto);
+        var updateWidgetResult = widgetService.v1Update(thirdWidget.getId(), new V1UpdateWidgetDto(0));
 
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, 0);
 
@@ -63,8 +62,7 @@ public class WidgetServiceUpdatingTests {
         var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
         var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetDto = new V1UpdateWidgetDto(null, null, 0, null, null);
-        var updateWidgetResult = widgetService.v1Update(firstWidget.getId(), updateWidgetDto);
+        var updateWidgetResult = widgetService.v1Update(firstWidget.getId(), new V1UpdateWidgetDto(0));
 
         firstWidget = convertFromV1WidgetDtoToV1WidgetDto(firstWidget, 0);
 
@@ -84,8 +82,7 @@ public class WidgetServiceUpdatingTests {
         var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
         var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetDto = new V1UpdateWidgetDto(null, null, 1, null, null);
-        var updateWidgetResult = widgetService.v1Update(thirdWidget.getId(), updateWidgetDto);
+        var updateWidgetResult = widgetService.v1Update(thirdWidget.getId(), new V1UpdateWidgetDto(1));
 
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, 1);
         firstWidget = convertFromV1WidgetDtoToV1WidgetDto(firstWidget, 2);
@@ -107,8 +104,7 @@ public class WidgetServiceUpdatingTests {
         var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
         var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(5)).getValue();
 
-        var updateWidgetDto = new V1UpdateWidgetDto(null, null, 3, null, null);
-        var updateWidgetResult = widgetService.v1Update(firstWidget.getId(), updateWidgetDto);
+        var updateWidgetResult = widgetService.v1Update(firstWidget.getId(), new V1UpdateWidgetDto(3));
 
         firstWidget = convertFromV1WidgetDtoToV1WidgetDto(firstWidget, 3);
 
