@@ -1,8 +1,9 @@
 package com.miro.widget.service.models;
 
-import lombok.Value;
+import lombok.*;
 
-@Value
+@Data
+@AllArgsConstructor
 public class V1UpdateWidgetDto {
     Integer centerX;
 
@@ -13,4 +14,8 @@ public class V1UpdateWidgetDto {
     Integer width;
 
     Integer height;
+
+    public V1UpdateWidgetDto(@NonNull Integer z) {
+        this.z = z;
+    }
 }

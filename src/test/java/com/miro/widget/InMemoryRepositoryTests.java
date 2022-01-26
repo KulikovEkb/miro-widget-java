@@ -1,23 +1,21 @@
 package com.miro.widget;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.Assertions.*;
-
 import com.miro.widget.mappers.BllAndDalMapperImpl;
 import com.miro.widget.service.repositories.InMemoryRepositoryImpl;
 import com.miro.widget.service.repositories.WidgetRepository;
-import com.miro.widget.service.repositories.models.V1InsertWidgetModel;
-import com.miro.widget.service.repositories.models.V1UpdateWidgetModel;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import result.errors.NotFoundError;
 
 import java.util.UUID;
+
+import static com.miro.widget.helpers.Generator.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class InMemoryRepositoryTests {
@@ -190,24 +188,5 @@ public class InMemoryRepositoryTests {
         assertTrue(deletingResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
         assertThat(getAllResult.getValue().size()).isEqualTo(0);
-    }
-
-    private static V1InsertWidgetModel generateV1InsertWidgetModel() {
-        return new V1InsertWidgetModel(
-            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE));
-    }
-
-    private static V1UpdateWidgetModel generateV1UpdateWidgetModel(UUID id) {
-        return new V1UpdateWidgetModel(
-            id,
-            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }
 }

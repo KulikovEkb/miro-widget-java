@@ -6,7 +6,6 @@ import com.miro.widget.controllers.models.requests.V1CreateWidgetRequest;
 import com.miro.widget.controllers.models.requests.V1UpdateWidgetRequest;
 import com.miro.widget.mappers.WebAndBllMapper;
 import com.miro.widget.service.WidgetService;
-import com.miro.widget.service.models.*;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,10 +21,10 @@ import result.Result;
 import result.errors.Error;
 import result.errors.NotFoundError;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.miro.widget.helpers.Generator.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -312,51 +311,6 @@ public class WidgetControllerTests {
     @Test
     public void v1_delete_by_ID_should_return_400() throws Exception {
         mockMvc.perform(delete("/api/v1/widgets/" + null)).andExpect(status().isBadRequest());
-    }
-
-    private static V1WidgetDto generateV1WidgetDto() {
-        return new V1WidgetDto(
-            UUID.randomUUID(),
-            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
-            new V1CoordinatesDto(RandomUtils.nextInt(), RandomUtils.nextInt()),
-            new V1SizeDto(RandomUtils.nextInt(1, Integer.MAX_VALUE), RandomUtils.nextInt(1, Integer.MAX_VALUE)),
-            ZonedDateTime.now());
-    }
-
-    private static V1CreateWidgetRequest generateV1CreateWidgetRequest() {
-        return new V1CreateWidgetRequest(
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE));
-    }
-
-    private static V1WidgetDto convertToDtoFromCreateRequest(UUID id, V1CreateWidgetRequest request) {
-        return new V1WidgetDto(
-            id,
-            request.getZ(),
-            new V1CoordinatesDto(request.getCenterX(), request.getCenterY()),
-            new V1SizeDto(request.getWidth(), request.getHeight()),
-            ZonedDateTime.now());
-    }
-
-    private static V1UpdateWidgetRequest generateV1UpdateWidgetRequest() {
-        return new V1UpdateWidgetRequest(
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE));
-    }
-
-    private static V1WidgetDto convertToDtoFromUpdateRequest(UUID id, V1UpdateWidgetRequest request) {
-        return new V1WidgetDto(
-            id,
-            request.getZ(),
-            new V1CoordinatesDto(request.getCenterX(), request.getCenterY()),
-            new V1SizeDto(request.getWidth(), request.getHeight()),
-            ZonedDateTime.now());
     }
 
 }

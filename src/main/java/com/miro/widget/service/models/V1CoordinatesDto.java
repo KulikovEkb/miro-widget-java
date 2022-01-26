@@ -1,9 +1,9 @@
 package com.miro.widget.service.models;
 
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 
-@Value
+@Data
+@AllArgsConstructor
 public class V1CoordinatesDto {
     @NonNull
     Integer centerX;

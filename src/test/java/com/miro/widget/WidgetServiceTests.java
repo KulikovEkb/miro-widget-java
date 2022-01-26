@@ -1,9 +1,7 @@
 package com.miro.widget;
 
 import com.miro.widget.service.WidgetServiceImpl;
-import com.miro.widget.service.models.*;
 import com.miro.widget.service.repositories.WidgetRepository;
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,10 +12,10 @@ import result.Result;
 import result.errors.Error;
 import result.errors.NotFoundError;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.miro.widget.helpers.Generator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -168,6 +166,32 @@ public class WidgetServiceTests {
     }
 
     @Test
+    public void should_be_failed_when_failed_to_update_single_existing_widget() {
+        var creationDto = generateV1CreateWidgetDto();
+        var createdWidget = convertToWidgetDtoFromCreationDto(creationDto);
+        var updatingDto = generateV1UpdateWidgetDto(null);
+
+        when(widgetRepository.v1GetByZIndex(creationDto.getZ()))
+            .thenReturn(Result.Fail(new NotFoundError("")));
+        when(widgetRepository.v1Insert(argThat(x -> x.getZ().equals(creationDto.getZ()))))
+            .thenReturn(Result.Ok(createdWidget));
+        when(widgetRepository.v1Update(argThat(x -> x.getId().equals(createdWidget.getId()))))
+            .thenReturn(Result.Fail(new Error("updating error")));
+
+        widgetService.v1Create(creationDto);
+
+        var updatingResult = widgetService.v1Update(createdWidget.getId(), updatingDto);
+
+        assertTrue(updatingResult.isFailed());
+        assertNull(updatingResult.getValue());
+        assertThat(updatingResult.getError().getMessage()).isEqualTo("updating error");
+
+        /*verify(widgetRepository, times(1)).v1GetByZIndex(creationDto.getZ());
+        verify(widgetRepository, times(1)).v1Insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
+        verify(widgetRepository, times(1)).v1Update(argThat(x -> x.getId().equals(createdWidget.getId())));*/
+    }
+
+    @Test
     public void should_successfully_delete_by_ID() {
         var widgetId = UUID.randomUUID();
 
@@ -180,103 +204,17 @@ public class WidgetServiceTests {
         //verify(widgetRepository, times(1)).v1Delete(widgetId);
     }
 
-
-    /*[Test]
-        public async Task Should_successfully_insert_to_the_end_without_shift()
-        {
-            var fixture = new Fixture();
-
-            var firstWidget =
-                await _widgetService.V1Create(fixture.Build<V1CreateWidgetDto>().With(x => x.ZIndex, 1).Create());
-            var secondWidget =
-                await _widgetService.V1Create(fixture.Build<V1CreateWidgetDto>().With(x => x.ZIndex, 2).Create());
-            var thirdWidget =
-                await _widgetService.V1Create(fixture.Build<V1CreateWidgetDto>().With(x => x.ZIndex, 3).Create());
-            var fourthWidget =
-                await _widgetService.V1Create(fixture.Build<V1CreateWidgetDto>().With(x => x.ZIndex, 4).Create());
-
-            var expected = new List<V1WidgetDto>(new[]
-            {
-                firstWidget.Value,
-                secondWidget.Value,
-                thirdWidget.Value,
-                fourthWidget.Value
-            });
-
-            var getAllResult = await _widgetService.V1GetAll();
-
-            getAllResult.Should().BeEquivalentTo(expected);
-        }
-*/
-
-    /*
-
-    @Test
-    public void should_be_failed_when_failed_to_update() {
-        widgetRepository.v1Insert(generateV1InsertWidgetModel());
-
-        var updatingModel = generateV1UpdateWidgetModel(UUID.randomUUID());
-        var updatingResult = widgetRepository.v1Update(updatingModel);
-
-        assertTrue(updatingResult.isFailed());
-        assertTrue(updatingResult.hasError(NotFoundError.class));
-    }
     @Test
     public void should_be_failed_when_failed_to_delete_by_ID() {
-        widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        var widgetId = UUID.randomUUID();
 
-        var deletingResult = widgetRepository.v1Delete(UUID.randomUUID());
+        when(widgetRepository.v1Delete(widgetId)).thenReturn(PlainResult.Fail(new Error("deleting error")));
+
+        var deletingResult = widgetRepository.v1Delete(widgetId);
 
         assertTrue(deletingResult.isFailed());
-        assertTrue(deletingResult.hasError(NotFoundError.class));
-    }*/
+        assertThat(deletingResult.getError().getMessage()).isEqualTo("deleting error");
 
-    private static V1CreateWidgetDto generateV1CreateWidgetDto() {
-        return generateV1CreateWidgetDto(RandomUtils.nextInt());
-    }
-
-    private static V1CreateWidgetDto generateV1CreateWidgetDto(Integer z) {
-        return new V1CreateWidgetDto(
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(),
-            z,
-            RandomUtils.nextInt(1, Integer.MAX_VALUE),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE));
-    }
-
-    private static V1WidgetDto generateV1WidgetDto() {
-        return new V1WidgetDto(
-            UUID.randomUUID(),
-            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
-            new V1CoordinatesDto(RandomUtils.nextInt(), RandomUtils.nextInt()),
-            new V1SizeDto(RandomUtils.nextInt(1, Integer.MAX_VALUE), RandomUtils.nextInt(1, Integer.MAX_VALUE)),
-            ZonedDateTime.now());
-    }
-
-    private static V1WidgetDto convertToWidgetDtoFromCreationDto(V1CreateWidgetDto dto) {
-        return new V1WidgetDto(
-            UUID.randomUUID(),
-            dto.getZ(),
-            new V1CoordinatesDto(dto.getCenterX(), dto.getCenterY()),
-            new V1SizeDto(dto.getWidth(), dto.getHeight()),
-            ZonedDateTime.now());
-    }
-
-    private static V1UpdateWidgetDto generateV1UpdateWidgetDto() {
-        return new V1UpdateWidgetDto(
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(),
-            RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE),
-            RandomUtils.nextInt(1, Integer.MAX_VALUE));
-    }
-
-    private static V1WidgetDto convertToWidgetDtoFromUpdatingDto(UUID id, V1UpdateWidgetDto dto) {
-        return new V1WidgetDto(
-            id,
-            dto.getZ(),
-            new V1CoordinatesDto(dto.getCenterX(), dto.getCenterY()),
-            new V1SizeDto(dto.getWidth(), dto.getHeight()),
-            ZonedDateTime.now());
+        //verify(widgetRepository, times(1)).v1Delete(widgetId);
     }
 }

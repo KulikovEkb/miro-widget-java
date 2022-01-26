@@ -1,7 +1,6 @@
 package com.miro.widget.service.models;
 
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
