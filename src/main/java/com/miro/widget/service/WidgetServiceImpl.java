@@ -6,6 +6,7 @@ import com.miro.widget.service.models.V1WidgetDto;
 import com.miro.widget.service.repositories.WidgetRepository;
 import com.miro.widget.service.repositories.models.V1InsertWidgetModel;
 import com.miro.widget.service.repositories.models.V1UpdateWidgetModel;
+import com.miro.widget.service.models.V1WidgetRangeDto;
 import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import result.PlainResult;
 import result.Result;
 import result.errors.Error;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -56,8 +56,8 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Synchronized
-    public Result<List<V1WidgetDto>> v1GetAll() {
-        return widgetRepository.v1GetAll();
+    public Result<V1WidgetRangeDto> v1GetRange(int page, int size) {
+        return widgetRepository.v1GetRange(page, size);
     }
 
     @Synchronized

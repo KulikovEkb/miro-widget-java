@@ -19,6 +19,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import result.errors.NotFoundError;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -98,13 +100,18 @@ public class WidgetController {
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<?> v1GetAll() {
-        var getWidgetsResult = widgetService.v1GetAll();
+    public ResponseEntity<?> v1GetRange(
+        @RequestParam(defaultValue = "1") @Min(1) @Max(Integer.MAX_VALUE) int page,
+        @RequestParam(defaultValue = "10") @Min(1) @Max(500) int size) {
+        var getWidgetsResult = widgetService.v1GetRange(page, size);
 
         if (getWidgetsResult.isFailed())
             return ResponseEntity.internalServerError().body(getWidgetsResult.getError());
 
-        return ResponseEntity.ok(new V1GetAllWidgetsResponse(getWidgetsResult.getValue()
+        return ResponseEntity.ok(new V1GetAllWidgetsResponse(
+            getWidgetsResult.getValue().getTotalWidgetsCount(),
+            getWidgetsResult.getValue().getTotalPagesCount(),
+            getWidgetsResult.getValue().getWidgets()
             .stream()
             .map(mapper::v1DtoToGetAllItem)
             .collect(toList())));

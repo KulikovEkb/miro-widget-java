@@ -42,10 +42,11 @@ public class WidgetServiceCreationTests {
         var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
         var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
 
-        var getAllResult = widgetService.v1GetAll();
+        var getAllResult = widgetService.v1GetRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue()).isEqualTo(List.of(firstWidget, secondWidget, thirdWidget, fourthWidget));
+        assertThat(getAllResult.getValue().getWidgets())
+            .isEqualTo(List.of(firstWidget, secondWidget, thirdWidget, fourthWidget));
     }
 
     @Test
@@ -59,10 +60,10 @@ public class WidgetServiceCreationTests {
 
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, fourthWidget.getZ() + 1);
 
-        var getAllResult = widgetService.v1GetAll();
+        var getAllResult = widgetService.v1GetRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue())
+        assertThat(getAllResult.getValue().getWidgets())
             .usingRecursiveComparison(RecursiveComparisonConfiguration.builder().withIgnoredFields("updatedAt").build())
             .isEqualTo(List.of(firstWidget, secondWidget, thirdWidget, insertedWidget, fourthWidget));
     }
@@ -76,10 +77,10 @@ public class WidgetServiceCreationTests {
 
         var insertedWidget = widgetService.v1Create(generateV1CreateWidgetDto(-4)).getValue();
 
-        var getAllResult = widgetService.v1GetAll();
+        var getAllResult = widgetService.v1GetRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue())
+        assertThat(getAllResult.getValue().getWidgets())
             .isEqualTo(List.of(insertedWidget, firstWidget, secondWidget, thirdWidget, fourthWidget));
     }
 
@@ -97,10 +98,10 @@ public class WidgetServiceCreationTests {
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, thirdWidget.getZ() + 1);
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, fourthWidget.getZ() + 1);
 
-        var getAllResult = widgetService.v1GetAll();
+        var getAllResult = widgetService.v1GetRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue())
+        assertThat(getAllResult.getValue().getWidgets())
             .usingRecursiveComparison(RecursiveComparisonConfiguration.builder().withIgnoredFields("updatedAt").build())
             .isEqualTo(List.of(insertedWidget, firstWidget, secondWidget, thirdWidget, fourthWidget));
     }
@@ -114,10 +115,10 @@ public class WidgetServiceCreationTests {
 
         var insertedWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
 
-        var getAllResult = widgetService.v1GetAll();
+        var getAllResult = widgetService.v1GetRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue())
+        assertThat(getAllResult.getValue().getWidgets())
             .isEqualTo(List.of(firstWidget, secondWidget, insertedWidget, thirdWidget, fourthWidget));
     }
 
@@ -134,10 +135,10 @@ public class WidgetServiceCreationTests {
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, thirdWidget.getZ() + 1);
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, fourthWidget.getZ() + 1);
 
-        var getAllResult = widgetService.v1GetAll();
+        var getAllResult = widgetService.v1GetRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue())
+        assertThat(getAllResult.getValue().getWidgets())
             .usingRecursiveComparison(RecursiveComparisonConfiguration.builder().withIgnoredFields("updatedAt").build())
             .isEqualTo(List.of(firstWidget, insertedWidget, secondWidget, thirdWidget, fourthWidget));
     }

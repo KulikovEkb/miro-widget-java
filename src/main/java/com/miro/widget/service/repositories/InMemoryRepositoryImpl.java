@@ -13,7 +13,6 @@ import result.errors.Error;
 import result.errors.NotFoundError;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -74,13 +73,31 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
         return Result.Ok(mapper.v1EntityToDto(widgetEntity));
     }
 
-    public Result<List<V1WidgetDto>> v1GetAll() {
+    public Result<V1WidgetRangeDto> v1GetRange(int page, int size) {
         try {
-            return Result.Ok(zIndexToWidgetMap
+            var valuesCount = zIndexToWidgetMap.values().size();
+            var pagesCount = valuesCount / size;
+            if (pagesCount * size < valuesCount)
+                pagesCount++;
+
+            return Result.Ok(new V1WidgetRangeDto(
+                valuesCount,
+                pagesCount,
+                zIndexToWidgetMap
+                    .values()
+                    .stream()
+                    .skip((long) (page - 1) * size)
+                    .limit(size)
+                    .map(mapper::v1EntityToDto)
+                    .collect(Collectors.toList())
+            ));
+            /*return Result.Ok(zIndexToWidgetMap
                 .values()
                 .stream()
+                .skip((long) (page - 1) * size)
+                .limit(size)
                 .map(mapper::v1EntityToDto)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()));*/
         } catch (Exception exc) {
             var message = String.format("Failed to retrieve all widgets: %s", exc.getMessage());
             log.error(message);

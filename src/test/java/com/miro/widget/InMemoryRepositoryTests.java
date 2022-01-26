@@ -55,7 +55,7 @@ public class InMemoryRepositoryTests {
 
         assertTrue(insertionResult.isFailed());
         assertNull(insertionResult.getValue());
-        assertThat(widgetRepository.v1GetAll().getValue().size()).isEqualTo(0);
+        assertThat(widgetRepository.v1GetRange(1, 10).getValue().getWidgets().size()).isEqualTo(0);
     }
 
     @Test
@@ -102,11 +102,11 @@ public class InMemoryRepositoryTests {
     public void should_successfully_get_all_inserted_widgets() {
         var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
 
-        var getAllResult = widgetRepository.v1GetAll();
+        var getAllResult = widgetRepository.v1GetRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue().size()).isEqualTo(1);
-        assertThat(getAllResult.getValue().get(0)).usingRecursiveComparison().isEqualTo(insertedWidget);
+        assertThat(getAllResult.getValue().getWidgets().size()).isEqualTo(1);
+        assertThat(getAllResult.getValue().getWidgets().get(0)).usingRecursiveComparison().isEqualTo(insertedWidget);
     }
 
     @Test
@@ -140,7 +140,7 @@ public class InMemoryRepositoryTests {
             .isEqualTo(widgetRepository.v1GetByZIndex(updatingModel.getZ()).getValue());
         assertThat(updatingResult.getValue())
             .usingRecursiveComparison()
-            .isEqualTo(widgetRepository.v1GetAll().getValue().get(0));
+            .isEqualTo(widgetRepository.v1GetRange(1, 10).getValue().getWidgets().get(0));
     }
 
     @Test
@@ -160,11 +160,11 @@ public class InMemoryRepositoryTests {
 
         var deletingResult = widgetRepository.v1Delete(insertedWidget.getId());
 
-        var getAllResult = widgetRepository.v1GetAll();
+        var getAllResult = widgetRepository.v1GetRange(1, 10);
 
         assertTrue(deletingResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue().size()).isEqualTo(0);
+        assertThat(getAllResult.getValue().getWidgets().size()).isEqualTo(0);
     }
 
     @Test
@@ -183,10 +183,10 @@ public class InMemoryRepositoryTests {
 
         var deletingResult = widgetRepository.v1DeleteAll();
 
-        var getAllResult = widgetRepository.v1GetAll();
+        var getAllResult = widgetRepository.v1GetRange(1, 10);
 
         assertTrue(deletingResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue().size()).isEqualTo(0);
+        assertThat(getAllResult.getValue().getWidgets().size()).isEqualTo(0);
     }
 }

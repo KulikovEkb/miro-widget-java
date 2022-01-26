@@ -2,6 +2,7 @@ package com.miro.widget;
 
 import com.miro.widget.service.WidgetServiceImpl;
 import com.miro.widget.service.repositories.WidgetRepository;
+import com.miro.widget.service.models.V1WidgetRangeDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -123,13 +124,13 @@ public class WidgetServiceTests {
     public void should_successfully_get_all_inserted_widgets() {
         var widgetDto = generateV1WidgetDto();
 
-        when(widgetRepository.v1GetAll()).thenReturn(Result.Ok(List.of(widgetDto)));
+        when(widgetRepository.v1GetRange(1, 1)).thenReturn(Result.Ok(new V1WidgetRangeDto(1, 1, List.of(widgetDto))));
 
-        var getAllResult = widgetService.v1GetAll();
+        var getAllResult = widgetService.v1GetRange(1, 1);
 
         assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue().size()).isEqualTo(1);
-        assertThat(getAllResult.getValue().get(0)).usingRecursiveComparison().isEqualTo(widgetDto);
+        assertThat(getAllResult.getValue().getWidgets().size()).isEqualTo(1);
+        assertThat(getAllResult.getValue().getWidgets().get(0)).usingRecursiveComparison().isEqualTo(widgetDto);
 
         //verify(widgetRepository, times(1)).v1GetAll();
     }

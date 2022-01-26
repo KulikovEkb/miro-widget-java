@@ -9,5 +9,4 @@ class WidgetApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

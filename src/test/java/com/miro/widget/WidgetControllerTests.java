@@ -6,6 +6,7 @@ import com.miro.widget.controllers.models.requests.V1CreateWidgetRequest;
 import com.miro.widget.controllers.models.requests.V1UpdateWidgetRequest;
 import com.miro.widget.mappers.WebAndBllMapper;
 import com.miro.widget.service.WidgetService;
+import com.miro.widget.service.models.V1WidgetRangeDto;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -181,14 +182,15 @@ public class WidgetControllerTests {
 
     @Test
     public void v1_get_all_should_return_200() throws Exception {
-        Mockito.when(widgetService.v1GetAll()).thenReturn(Result.Ok(List.of(generateV1WidgetDto())));
+        Mockito.when(widgetService.v1GetRange(1, 10))
+            .thenReturn(Result.Ok(new V1WidgetRangeDto(1, 1, List.of(generateV1WidgetDto()))));
 
         mockMvc.perform(get("/api/v1/widgets")).andExpect(status().isOk());
     }
 
     @Test
     public void v1_get_all_should_return_500() throws Exception {
-        Mockito.when(widgetService.v1GetAll()).thenReturn(Result.Fail(new Error("get all error")));
+        Mockito.when(widgetService.v1GetRange(1, 10)).thenReturn(Result.Fail(new Error("get all error")));
 
         mockMvc.perform(get("/api/v1/widgets")).andExpect(status().isInternalServerError());
     }
