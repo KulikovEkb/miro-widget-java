@@ -1,14 +1,15 @@
 package com.miro.widget.service.models;
 
+import com.miro.widget.service.models.widget.Widget;
 import lombok.Value;
 
 import java.util.List;
 
 @Value
-public class V1WidgetRangeDto {
+public class WidgetRange {
     int totalWidgetsCount;
 
     int totalPagesCount;
 
-    List<V1WidgetDto> widgets;
+    List<Widget> widgets;
 }

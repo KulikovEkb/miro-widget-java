@@ -1,4 +1,4 @@
-package com.miro.widget.service.repositories.models;
+package com.miro.widget.service.repositories.models.params;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-public class V1UpdateWidgetModel {
+public class UpdateWidgetParams {
     @NonNull
     UUID id;
 
@@ -20,7 +20,7 @@ public class V1UpdateWidgetModel {
 
     Integer height;
 
-    public V1UpdateWidgetModel(@NonNull UUID id, @NonNull Integer z) {
+    public UpdateWidgetParams(@NonNull UUID id, @NonNull Integer z) {
         this.id = id;
         this.z = z;
     }

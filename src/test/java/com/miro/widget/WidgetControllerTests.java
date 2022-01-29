@@ -6,7 +6,7 @@ import com.miro.widget.controllers.models.requests.V1CreateWidgetRequest;
 import com.miro.widget.controllers.models.requests.V1UpdateWidgetRequest;
 import com.miro.widget.mappers.WebAndBllMapper;
 import com.miro.widget.service.WidgetService;
-import com.miro.widget.service.models.V1WidgetRangeDto;
+import com.miro.widget.service.models.WidgetRange;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +51,7 @@ public class WidgetControllerTests {
         var request = generateV1CreateWidgetRequest();
         var widgetDto = convertToDtoFromCreateRequest(UUID.randomUUID(), request);
 
-        Mockito.when(widgetService.v1Create(any())).thenReturn(Result.Ok(widgetDto));
+        Mockito.when(widgetService.create(any())).thenReturn(Result.Ok(widgetDto));
 
         mockMvc.perform(post("/api/v1/widgets")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -63,7 +63,7 @@ public class WidgetControllerTests {
     public void v1_create_should_return_500() throws Exception {
         var request = generateV1CreateWidgetRequest();
 
-        Mockito.when(widgetService.v1Create(any())).thenReturn(Result.Fail(new Error("creation error")));
+        Mockito.when(widgetService.create(any())).thenReturn(Result.Fail(new Error("creation error")));
 
         mockMvc.perform(post("/api/v1/widgets")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -150,7 +150,7 @@ public class WidgetControllerTests {
     public void v1_get_by_ID_should_return_200() throws Exception {
         var widgetId = UUID.randomUUID();
 
-        Mockito.when(widgetService.v1GetById(widgetId)).thenReturn(Result.Ok(generateV1WidgetDto()));
+        Mockito.when(widgetService.getById(widgetId)).thenReturn(Result.Ok(generateV1WidgetDto()));
 
         mockMvc.perform(get("/api/v1/widgets/" + widgetId)).andExpect(status().isOk());
     }
@@ -159,7 +159,7 @@ public class WidgetControllerTests {
     public void v1_get_by_ID_should_return_404() throws Exception {
         var widgetId = UUID.randomUUID();
 
-        Mockito.when(widgetService.v1GetById(argThat(x -> x.equals(widgetId))))
+        Mockito.when(widgetService.getById(argThat(x -> x.equals(widgetId))))
             .thenReturn(Result.Fail(new NotFoundError("not found")));
 
         mockMvc.perform(get("/api/v1/widgets/" + widgetId)).andExpect(status().isNotFound());
@@ -169,7 +169,7 @@ public class WidgetControllerTests {
     public void v1_get_by_ID_should_return_500() throws Exception {
         var widgetId = UUID.randomUUID();
 
-        Mockito.when(widgetService.v1GetById(argThat(x -> x.equals(widgetId))))
+        Mockito.when(widgetService.getById(argThat(x -> x.equals(widgetId))))
             .thenReturn(Result.Fail(new Error("get by ID error")));
 
         mockMvc.perform(get("/api/v1/widgets/" + widgetId)).andExpect(status().isInternalServerError());
@@ -182,15 +182,15 @@ public class WidgetControllerTests {
 
     @Test
     public void v1_get_all_should_return_200() throws Exception {
-        Mockito.when(widgetService.v1GetRange(1, 10))
-            .thenReturn(Result.Ok(new V1WidgetRangeDto(1, 1, List.of(generateV1WidgetDto()))));
+        Mockito.when(widgetService.getRange(1, 10))
+            .thenReturn(Result.Ok(new WidgetRange(1, 1, List.of(generateV1WidgetDto()))));
 
         mockMvc.perform(get("/api/v1/widgets")).andExpect(status().isOk());
     }
 
     @Test
     public void v1_get_all_should_return_500() throws Exception {
-        Mockito.when(widgetService.v1GetRange(1, 10)).thenReturn(Result.Fail(new Error("get all error")));
+        Mockito.when(widgetService.getRange(1, 10)).thenReturn(Result.Fail(new Error("get all error")));
 
         mockMvc.perform(get("/api/v1/widgets")).andExpect(status().isInternalServerError());
     }
@@ -200,7 +200,7 @@ public class WidgetControllerTests {
         var request = generateV1UpdateWidgetRequest();
         var widgetDto = convertToDtoFromUpdateRequest(UUID.randomUUID(), request);
 
-        Mockito.when(widgetService.v1Update(any(), any())).thenReturn(Result.Ok(widgetDto));
+        Mockito.when(widgetService.update(any(), any())).thenReturn(Result.Ok(widgetDto));
 
         mockMvc.perform(put("/api/v1/widgets/" + widgetDto.getId())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -210,7 +210,7 @@ public class WidgetControllerTests {
 
     @Test
     public void v1_update_should_return_404() throws Exception {
-        Mockito.when(widgetService.v1Update(any(), any())).thenReturn(Result.Fail(new NotFoundError("not found")));
+        Mockito.when(widgetService.update(any(), any())).thenReturn(Result.Fail(new NotFoundError("not found")));
 
         mockMvc.perform(put("/api/v1/widgets/" + UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -220,7 +220,7 @@ public class WidgetControllerTests {
 
     @Test
     public void v1_update_should_return_500() throws Exception {
-        Mockito.when(widgetService.v1Update(any(), any())).thenReturn(Result.Fail(new Error("updating error")));
+        Mockito.when(widgetService.update(any(), any())).thenReturn(Result.Fail(new Error("updating error")));
 
         mockMvc.perform(put("/api/v1/widgets/" + UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -287,7 +287,7 @@ public class WidgetControllerTests {
     public void v1_delete_by_ID_should_return_200() throws Exception {
         var widgetId = UUID.randomUUID();
 
-        Mockito.when(widgetService.v1Delete(widgetId)).thenReturn(PlainResult.Ok());
+        Mockito.when(widgetService.delete(widgetId)).thenReturn(PlainResult.Ok());
 
         mockMvc.perform(delete("/api/v1/widgets/" + widgetId)).andExpect(status().isOk());
     }
@@ -296,7 +296,7 @@ public class WidgetControllerTests {
     public void v1_delete_by_ID_should_return_404() throws Exception {
         var widgetId = UUID.randomUUID();
 
-        Mockito.when(widgetService.v1Delete(widgetId)).thenReturn(PlainResult.Fail(new NotFoundError("not found")));
+        Mockito.when(widgetService.delete(widgetId)).thenReturn(PlainResult.Fail(new NotFoundError("not found")));
 
         mockMvc.perform(delete("/api/v1/widgets/" + widgetId)).andExpect(status().isNotFound());
     }
@@ -305,7 +305,7 @@ public class WidgetControllerTests {
     public void v1_delete_by_ID_should_return_500() throws Exception {
         var widgetId = UUID.randomUUID();
 
-        Mockito.when(widgetService.v1Delete(widgetId)).thenReturn(PlainResult.Fail(new Error("delete error")));
+        Mockito.when(widgetService.delete(widgetId)).thenReturn(PlainResult.Fail(new Error("delete error")));
 
         mockMvc.perform(delete("/api/v1/widgets/" + widgetId)).andExpect(status().isInternalServerError());
     }

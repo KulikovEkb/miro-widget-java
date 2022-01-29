@@ -1,12 +1,11 @@
 package com.miro.widget.service;
 
-import com.miro.widget.service.models.V1CreateWidgetDto;
-import com.miro.widget.service.models.V1UpdateWidgetDto;
-import com.miro.widget.service.models.V1WidgetDto;
+import com.miro.widget.service.models.params.CreateWidgetParams;
+import com.miro.widget.service.models.params.UpdateWidgetParams;
+import com.miro.widget.service.models.widget.Widget;
 import com.miro.widget.service.repositories.WidgetRepository;
-import com.miro.widget.service.repositories.models.V1InsertWidgetModel;
-import com.miro.widget.service.repositories.models.V1UpdateWidgetModel;
-import com.miro.widget.service.models.V1WidgetRangeDto;
+import com.miro.widget.service.repositories.models.params.InsertWidgetParams;
+import com.miro.widget.service.models.WidgetRange;
 import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -32,7 +31,7 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Synchronized
-    public Result<V1WidgetDto> v1Create(V1CreateWidgetDto dto) {
+    public Result<Widget> create(CreateWidgetParams dto) {
         if (nextMaxIndex == Integer.MAX_VALUE)
             return Result.Fail(new Error("Max available Z index value reached"));
 
@@ -46,7 +45,7 @@ public class WidgetServiceImpl implements WidgetService {
                 nextMaxIndex = dto.getZ() + 1;
         }
 
-        return widgetRepository.v1Insert(new V1InsertWidgetModel(
+        return widgetRepository.insert(new InsertWidgetParams(
             dto.getZ() == null ? nextMaxIndex++ : dto.getZ(),
             dto.getCenterX(),
             dto.getCenterY(),
@@ -55,21 +54,21 @@ public class WidgetServiceImpl implements WidgetService {
         ));
     }
 
-    public Result<V1WidgetDto> v1GetById(UUID id) {
-        return widgetRepository.v1GetById(id);
+    public Result<Widget> getById(UUID id) {
+        return widgetRepository.getById(id);
     }
 
-    public Result<V1WidgetRangeDto> v1GetRange(int page, int size) {
-        return widgetRepository.v1GetRange(page, size);
+    public Result<WidgetRange> getRange(int page, int size) {
+        return widgetRepository.getRange(page, size);
     }
 
     @Synchronized
-    public Result<V1WidgetDto> v1Update(UUID id, V1UpdateWidgetDto dto) {
+    public Result<Widget> update(UUID id, UpdateWidgetParams dto) {
         if (dto.getZ() != null) {
             if (dto.getZ() == Integer.MAX_VALUE)
                 return Result.Fail(new Error("Z index value is too big"));
 
-            var getCurrentWidgetResult = widgetRepository.v1GetById(id);
+            var getCurrentWidgetResult = widgetRepository.getById(id);
 
             if (getCurrentWidgetResult.isFailed())
                 return getCurrentWidgetResult;
@@ -84,13 +83,13 @@ public class WidgetServiceImpl implements WidgetService {
                 nextMaxIndex = dto.getZ() + 1;
         }
 
-        return widgetRepository.v1Update(new V1UpdateWidgetModel(
+        return widgetRepository.update(new com.miro.widget.service.repositories.models.params.UpdateWidgetParams(
             id, dto.getZ(), dto.getCenterX(), dto.getCenterY(), dto.getWidth(), dto.getHeight()));
     }
 
     @Synchronized
-    public PlainResult v1Delete(UUID id) {
-        return widgetRepository.v1Delete(id);
+    public PlainResult delete(UUID id) {
+        return widgetRepository.delete(id);
     }
 
     void shift(int startIndex) {
@@ -98,12 +97,12 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     void shift(int startIndex, int endIndex) {
-        var getSwapItemResult = widgetRepository.v1GetByZIndex(startIndex);
+        var getSwapItemResult = widgetRepository.getByZIndex(startIndex);
 
         for (var i = startIndex + 1; getSwapItemResult.isSucceed() && i <= endIndex; i++) {
-            var tempItem = widgetRepository.v1GetByZIndex(i);
+            var tempItem = widgetRepository.getByZIndex(i);
 
-            widgetRepository.v1Update(new V1UpdateWidgetModel(getSwapItemResult.getValue().getId(), i));
+            widgetRepository.update(new com.miro.widget.service.repositories.models.params.UpdateWidgetParams(getSwapItemResult.getValue().getId(), i));
 
             getSwapItemResult = tempItem;
 

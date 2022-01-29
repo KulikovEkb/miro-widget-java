@@ -1,26 +1,26 @@
 package com.miro.widget.service.repositories;
 
-import com.miro.widget.service.models.V1WidgetDto;
-import com.miro.widget.service.repositories.models.V1InsertWidgetModel;
-import com.miro.widget.service.repositories.models.V1UpdateWidgetModel;
-import com.miro.widget.service.models.V1WidgetRangeDto;
+import com.miro.widget.service.models.widget.Widget;
+import com.miro.widget.service.repositories.models.params.InsertWidgetParams;
+import com.miro.widget.service.repositories.models.params.UpdateWidgetParams;
+import com.miro.widget.service.models.WidgetRange;
 import result.PlainResult;
 import result.Result;
 
 import java.util.UUID;
 
 public interface WidgetRepository {
-    Result<V1WidgetDto> v1Insert(V1InsertWidgetModel model);
+    Result<Widget> insert(InsertWidgetParams model);
 
-    Result<V1WidgetDto> v1GetById(UUID id);
+    Result<Widget> getById(UUID id);
 
-    Result<V1WidgetDto> v1GetByZIndex(int z);
+    Result<Widget> getByZIndex(int z);
 
-    Result<V1WidgetRangeDto> v1GetRange(int page, int size);
+    Result<WidgetRange> getRange(int page, int size);
 
-    Result<V1WidgetDto> v1Update(V1UpdateWidgetModel model);
+    Result<Widget> update(UpdateWidgetParams model);
 
-    PlainResult v1Delete(UUID id);
+    PlainResult delete(UUID id);
 
-    PlainResult v1DeleteAll();
+    PlainResult deleteAll();
 }

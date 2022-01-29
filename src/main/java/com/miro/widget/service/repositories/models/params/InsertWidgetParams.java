@@ -1,10 +1,10 @@
-package com.miro.widget.service.repositories.models;
+package com.miro.widget.service.repositories.models.params;
 
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
-public class V1InsertWidgetModel {
+public class InsertWidgetParams {
     @NonNull
     Integer z;
 

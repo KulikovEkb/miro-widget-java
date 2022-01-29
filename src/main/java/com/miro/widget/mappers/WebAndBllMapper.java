@@ -2,13 +2,14 @@ package com.miro.widget.mappers;
 
 import com.miro.widget.controllers.models.requests.*;
 import com.miro.widget.controllers.models.responses.*;
-import com.miro.widget.service.models.*;
+import com.miro.widget.service.models.params.*;
+import com.miro.widget.service.models.widget.Widget;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public abstract class WebAndBllMapper {
-    public V1CreateWidgetDto v1CreateRequestToDto(V1CreateWidgetRequest request) {
-        return new V1CreateWidgetDto(
+    public CreateWidgetParams v1CreateRequestToBllModel(V1CreateWidgetRequest request) {
+        return new CreateWidgetParams(
             request.getCenterX(),
             request.getCenterY(),
             request.getZ(),
@@ -17,8 +18,8 @@ public abstract class WebAndBllMapper {
         );
     }
 
-    public V1UpdateWidgetDto v1UpdateRequestToDto(V1UpdateWidgetRequest request) {
-        return new V1UpdateWidgetDto(
+    public UpdateWidgetParams v1UpdateRequestToBllModel(V1UpdateWidgetRequest request) {
+        return new UpdateWidgetParams(
             request.getCenterX(),
             request.getCenterY(),
             request.getZ(),
@@ -27,67 +28,67 @@ public abstract class WebAndBllMapper {
         );
     }
 
-    public V1CreateWidgetResponse v1DtoToCreationResponse(V1WidgetDto dto) {
+    public V1CreateWidgetResponse bllModelToV1CreationResponse(Widget bllModel) {
         return new V1CreateWidgetResponse(
-            dto.getId(),
-            dto.getZ(),
+            bllModel.getId(),
+            bllModel.getZ(),
             new V1Coordinates(
-                dto.getCoordinates().getCenterX(),
-                dto.getCoordinates().getCenterY()
+                bllModel.getCoordinates().getCenterX(),
+                bllModel.getCoordinates().getCenterY()
             ),
             new V1Size(
-                dto.getSize().getWidth(),
-                dto.getSize().getHeight()
+                bllModel.getSize().getWidth(),
+                bllModel.getSize().getHeight()
             ),
-            dto.getUpdatedAt()
+            bllModel.getUpdatedAt()
         );
     }
 
-    public V1UpdateWidgetResponse v1DtoToUpdatingResponse(V1WidgetDto dto) {
+    public V1UpdateWidgetResponse bllModelToV1UpdatingResponse(Widget bllModel) {
         return new V1UpdateWidgetResponse(
-            dto.getId(),
-            dto.getZ(),
+            bllModel.getId(),
+            bllModel.getZ(),
             new V1Coordinates(
-                dto.getCoordinates().getCenterX(),
-                dto.getCoordinates().getCenterY()
+                bllModel.getCoordinates().getCenterX(),
+                bllModel.getCoordinates().getCenterY()
             ),
             new V1Size(
-                dto.getSize().getWidth(),
-                dto.getSize().getHeight()
+                bllModel.getSize().getWidth(),
+                bllModel.getSize().getHeight()
             ),
-            dto.getUpdatedAt()
+            bllModel.getUpdatedAt()
         );
     }
 
-    public V1GetWidgetByIdResponse v1DtoToGetByIdResponse(V1WidgetDto dto) {
+    public V1GetWidgetByIdResponse bllModelToV1GetByIdResponse(Widget bllModel) {
         return new V1GetWidgetByIdResponse(
-            dto.getId(),
-            dto.getZ(),
+            bllModel.getId(),
+            bllModel.getZ(),
             new V1Coordinates(
-                dto.getCoordinates().getCenterX(),
-                dto.getCoordinates().getCenterY()
+                bllModel.getCoordinates().getCenterX(),
+                bllModel.getCoordinates().getCenterY()
             ),
             new V1Size(
-                dto.getSize().getWidth(),
-                dto.getSize().getHeight()
+                bllModel.getSize().getWidth(),
+                bllModel.getSize().getHeight()
             ),
-            dto.getUpdatedAt()
+            bllModel.getUpdatedAt()
         );
     }
 
-    public V1GetAllWidgetsItem v1DtoToGetAllItem(V1WidgetDto dto) {
-        return new V1GetAllWidgetsItem(
-            dto.getId(),
-            dto.getZ(),
+    public V1GetRangeItem bllModelToV1GetRangeItem(Widget bllModel) {
+        return new V1GetRangeItem(
+            bllModel.getId(),
+            bllModel.getZ(),
             new V1Coordinates(
-                dto.getCoordinates().getCenterX(),
-                dto.getCoordinates().getCenterY()
+                bllModel.getCoordinates().getCenterX(),
+                bllModel.getCoordinates().getCenterY()
             ),
             new V1Size(
-                dto.getSize().getWidth(),
-                dto.getSize().getHeight()
+                bllModel.getSize().getWidth(),
+                bllModel.getSize().getHeight()
             ),
-            dto.getUpdatedAt()
+            bllModel.getUpdatedAt()
         );
     }
 }

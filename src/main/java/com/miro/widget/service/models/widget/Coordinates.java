@@ -1,10 +1,10 @@
-package com.miro.widget.service.models;
+package com.miro.widget.service.models.widget;
 
 import lombok.*;
 
 @Data
 @AllArgsConstructor
-public class V1CoordinatesDto {
+public class Coordinates {
     @NonNull
     Integer centerX;
 

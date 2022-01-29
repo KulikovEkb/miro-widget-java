@@ -1,19 +1,22 @@
 package com.miro.widget.service;
 
 import com.miro.widget.service.models.*;
+import com.miro.widget.service.models.params.CreateWidgetParams;
+import com.miro.widget.service.models.params.UpdateWidgetParams;
+import com.miro.widget.service.models.widget.Widget;
 import result.PlainResult;
 import result.Result;
 
 import java.util.UUID;
 
 public interface WidgetService {
-    Result<V1WidgetDto> v1Create(V1CreateWidgetDto dto);
+    Result<Widget> create(CreateWidgetParams dto);
 
-    Result<V1WidgetDto> v1GetById(UUID id);
+    Result<Widget> getById(UUID id);
 
-    Result<V1WidgetRangeDto> v1GetRange(int page, int size);
+    Result<WidgetRange> getRange(int page, int size);
 
-    Result<V1WidgetDto> v1Update(UUID id, V1UpdateWidgetDto dto);
+    Result<Widget> update(UUID id, UpdateWidgetParams dto);
 
-    PlainResult v1Delete(UUID id);
+    PlainResult delete(UUID id);
 }

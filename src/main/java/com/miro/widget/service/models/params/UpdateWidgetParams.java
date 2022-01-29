@@ -1,10 +1,10 @@
-package com.miro.widget.service.models;
+package com.miro.widget.service.models.params;
 
 import lombok.*;
 
 @Data
 @AllArgsConstructor
-public class V1UpdateWidgetDto {
+public class UpdateWidgetParams {
     Integer centerX;
 
     Integer centerY;
@@ -15,7 +15,7 @@ public class V1UpdateWidgetDto {
 
     Integer height;
 
-    public V1UpdateWidgetDto(@NonNull Integer z) {
+    public UpdateWidgetParams(@NonNull Integer z) {
         this.z = z;
     }
 }

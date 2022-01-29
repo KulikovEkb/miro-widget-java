@@ -32,17 +32,17 @@ public class WidgetServiceCreationTests {
 
     @AfterEach
     public void tearDown() {
-        widgetRepository.v1DeleteAll();
+        widgetRepository.deleteAll();
     }
 
     @Test
     public void should_successfully_insert_to_the_end_without_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
         assertThat(getAllResult.getValue().getWidgets())
@@ -51,16 +51,16 @@ public class WidgetServiceCreationTests {
 
     @Test
     public void should_successfully_insert_to_the_end_with_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var insertedWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var insertedWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, fourthWidget.getZ() + 1);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
         assertThat(getAllResult.getValue().getWidgets())
@@ -70,14 +70,14 @@ public class WidgetServiceCreationTests {
 
     @Test
     public void should_successfully_insert_to_the_beginning_without_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var insertedWidget = widgetService.v1Create(generateV1CreateWidgetDto(-4)).getValue();
+        var insertedWidget = widgetService.create(generateV1CreateWidgetDto(-4)).getValue();
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
         assertThat(getAllResult.getValue().getWidgets())
@@ -86,19 +86,19 @@ public class WidgetServiceCreationTests {
 
     @Test
     public void should_successfully_insert_to_the_beginning_with_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var insertedWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
+        var insertedWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
 
         firstWidget = convertFromV1WidgetDtoToV1WidgetDto(firstWidget, firstWidget.getZ() + 1);
         secondWidget = convertFromV1WidgetDtoToV1WidgetDto(secondWidget, secondWidget.getZ() + 1);
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, thirdWidget.getZ() + 1);
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, fourthWidget.getZ() + 1);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
         assertThat(getAllResult.getValue().getWidgets())
@@ -108,14 +108,14 @@ public class WidgetServiceCreationTests {
 
     @Test
     public void should_successfully_insert_to_the_middle_without_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(5)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(5)).getValue();
 
-        var insertedWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
+        var insertedWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
         assertThat(getAllResult.getValue().getWidgets())
@@ -124,18 +124,18 @@ public class WidgetServiceCreationTests {
 
     @Test
     public void should_successfully_insert_to_the_middle_with_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var insertedWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
+        var insertedWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
 
         secondWidget = convertFromV1WidgetDtoToV1WidgetDto(secondWidget, secondWidget.getZ() + 1);
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, thirdWidget.getZ() + 1);
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, fourthWidget.getZ() + 1);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
         assertThat(getAllResult.getValue().getWidgets())

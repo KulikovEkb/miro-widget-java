@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Value
-public class V1GetAllWidgetsItem {
+public class V1GetRangeItem {
     @NotNull
     @Schema(
         name = "id",

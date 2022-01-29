@@ -1,12 +1,12 @@
-package com.miro.widget.service.repositories.models;
+package com.miro.widget.service.models.widget;
 
 import lombok.*;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-@Data
-public class V1WidgetEntity {
+@Value
+public class Widget {
     @NonNull
     UUID id;
 
@@ -14,17 +14,12 @@ public class V1WidgetEntity {
     Integer z;
 
     @NonNull
-    Integer centerX;
+    Coordinates coordinates;
 
     @NonNull
-    Integer centerY;
-
-    @NonNull
-    Integer width;
-
-    @NonNull
-    Integer height;
+    Size size;
 
     @NonNull
     ZonedDateTime updatedAt;
 }
+

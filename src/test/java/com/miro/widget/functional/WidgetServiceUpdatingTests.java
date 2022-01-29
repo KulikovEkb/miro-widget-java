@@ -3,7 +3,7 @@ package com.miro.widget.functional;
 import com.miro.widget.mappers.BllAndDalMapperImpl;
 import com.miro.widget.service.WidgetService;
 import com.miro.widget.service.WidgetServiceImpl;
-import com.miro.widget.service.models.V1UpdateWidgetDto;
+import com.miro.widget.service.models.params.UpdateWidgetParams;
 import com.miro.widget.service.repositories.InMemoryRepositoryImpl;
 import com.miro.widget.service.repositories.WidgetRepository;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
@@ -32,21 +32,21 @@ public class WidgetServiceUpdatingTests {
 
     @AfterEach
     public void tearDown() {
-        widgetRepository.v1DeleteAll();
+        widgetRepository.deleteAll();
     }
 
     @Test
     public void should_successfully_update_middle_element_to_the_first_one_without_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(thirdWidget.getId(), new V1UpdateWidgetDto(0));
+        var updateWidgetResult = widgetService.update(thirdWidget.getId(), new UpdateWidgetParams(0));
 
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, 0);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -57,16 +57,16 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_update_first_element_without_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(firstWidget.getId(), new V1UpdateWidgetDto(0));
+        var updateWidgetResult = widgetService.update(firstWidget.getId(), new UpdateWidgetParams(0));
 
         firstWidget = convertFromV1WidgetDtoToV1WidgetDto(firstWidget, 0);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -77,18 +77,18 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_update_middle_element_to_the_first_one_with_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(thirdWidget.getId(), new V1UpdateWidgetDto(1));
+        var updateWidgetResult = widgetService.update(thirdWidget.getId(), new UpdateWidgetParams(1));
 
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, 1);
         firstWidget = convertFromV1WidgetDtoToV1WidgetDto(firstWidget, 2);
         secondWidget = convertFromV1WidgetDtoToV1WidgetDto(secondWidget, 3);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -99,16 +99,16 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_update_first_element_to_the_middle_one_without_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(5)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(5)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(firstWidget.getId(), new V1UpdateWidgetDto(3));
+        var updateWidgetResult = widgetService.update(firstWidget.getId(), new UpdateWidgetParams(3));
 
         firstWidget = convertFromV1WidgetDtoToV1WidgetDto(firstWidget, 3);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -119,16 +119,16 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_update_last_element_to_the_middle_one_without_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(5)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(5)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(fourthWidget.getId(), new V1UpdateWidgetDto(3));
+        var updateWidgetResult = widgetService.update(fourthWidget.getId(), new UpdateWidgetParams(3));
 
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, 3);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -139,18 +139,18 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_update_last_element_to_the_middle_one_with_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(fourthWidget.getId(), new V1UpdateWidgetDto(2));
+        var updateWidgetResult = widgetService.update(fourthWidget.getId(), new UpdateWidgetParams(2));
 
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, 2);
         secondWidget = convertFromV1WidgetDtoToV1WidgetDto(secondWidget, 3);
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, 4);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -161,18 +161,18 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_update_first_element_to_the_middle_one_with_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(firstWidget.getId(), new V1UpdateWidgetDto(3));
+        var updateWidgetResult = widgetService.update(firstWidget.getId(), new UpdateWidgetParams(3));
 
         firstWidget = convertFromV1WidgetDtoToV1WidgetDto(firstWidget, 3);
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, 4);
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, 5);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -183,18 +183,18 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_update_middle_element_to_another_middle_one_with_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(secondWidget.getId(), new V1UpdateWidgetDto(3));
+        var updateWidgetResult = widgetService.update(secondWidget.getId(), new UpdateWidgetParams(3));
 
         secondWidget = convertFromV1WidgetDtoToV1WidgetDto(secondWidget, 3);
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, 4);
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, 5);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -205,17 +205,17 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_switch_middle_elements() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(thirdWidget.getId(), new V1UpdateWidgetDto(2));
+        var updateWidgetResult = widgetService.update(thirdWidget.getId(), new UpdateWidgetParams(2));
 
         thirdWidget = convertFromV1WidgetDtoToV1WidgetDto(thirdWidget, 2);
         secondWidget = convertFromV1WidgetDtoToV1WidgetDto(secondWidget, 3);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -226,16 +226,16 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_update_middle_element_to_the_last_one_without_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(secondWidget.getId(), new V1UpdateWidgetDto(5));
+        var updateWidgetResult = widgetService.update(secondWidget.getId(), new UpdateWidgetParams(5));
 
         secondWidget = convertFromV1WidgetDtoToV1WidgetDto(secondWidget, 5);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -246,16 +246,16 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_update_last_element_without_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(fourthWidget.getId(), new V1UpdateWidgetDto(5));
+        var updateWidgetResult = widgetService.update(fourthWidget.getId(), new UpdateWidgetParams(5));
 
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, 5);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -266,17 +266,17 @@ public class WidgetServiceUpdatingTests {
 
     @Test
     public void should_successfully_update_middle_element_to_the_last_one_with_shift() {
-        var firstWidget = widgetService.v1Create(generateV1CreateWidgetDto(1)).getValue();
-        var secondWidget = widgetService.v1Create(generateV1CreateWidgetDto(2)).getValue();
-        var thirdWidget = widgetService.v1Create(generateV1CreateWidgetDto(3)).getValue();
-        var fourthWidget = widgetService.v1Create(generateV1CreateWidgetDto(4)).getValue();
+        var firstWidget = widgetService.create(generateV1CreateWidgetDto(1)).getValue();
+        var secondWidget = widgetService.create(generateV1CreateWidgetDto(2)).getValue();
+        var thirdWidget = widgetService.create(generateV1CreateWidgetDto(3)).getValue();
+        var fourthWidget = widgetService.create(generateV1CreateWidgetDto(4)).getValue();
 
-        var updateWidgetResult = widgetService.v1Update(secondWidget.getId(), new V1UpdateWidgetDto(4));
+        var updateWidgetResult = widgetService.update(secondWidget.getId(), new UpdateWidgetParams(4));
 
         secondWidget = convertFromV1WidgetDtoToV1WidgetDto(secondWidget, 4);
         fourthWidget = convertFromV1WidgetDtoToV1WidgetDto(fourthWidget, 5);
 
-        var getAllResult = widgetService.v1GetRange(1, 10);
+        var getAllResult = widgetService.getRange(1, 10);
 
         assertTrue(updateWidgetResult.isSucceed());
         assertTrue(getAllResult.isSucceed());

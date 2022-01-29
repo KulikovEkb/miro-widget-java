@@ -28,13 +28,13 @@ public class InMemoryRepositoryTests {
 
     @AfterEach
     public void tearDown() {
-        widgetRepository.v1DeleteAll();
+        widgetRepository.deleteAll();
     }
 
     @Test
     public void should_successfully_insert() {
         var insertModel = generateV1InsertWidgetModel();
-        var insertionResult = widgetRepository.v1Insert(insertModel);
+        var insertionResult = widgetRepository.insert(insertModel);
 
         assertTrue(insertionResult.isSucceed());
         assertNotNull(insertionResult.getValue().getId());
@@ -46,23 +46,23 @@ public class InMemoryRepositoryTests {
 
         assertThat(insertionResult.getValue())
             .usingRecursiveComparison()
-            .isEqualTo(widgetRepository.v1GetById(insertionResult.getValue().getId()).getValue());
+            .isEqualTo(widgetRepository.getById(insertionResult.getValue().getId()).getValue());
     }
 
     @Test
     public void should_be_failed_when_failed_to_insert() {
-        var insertionResult = widgetRepository.v1Insert(null);
+        var insertionResult = widgetRepository.insert(null);
 
         assertTrue(insertionResult.isFailed());
         assertNull(insertionResult.getValue());
-        assertThat(widgetRepository.v1GetRange(1, 10).getValue().getWidgets().size()).isEqualTo(0);
+        assertThat(widgetRepository.getRange(1, 10).getValue().getWidgets().size()).isEqualTo(0);
     }
 
     @Test
     public void should_successfully_get_by_ID() {
-        var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
+        var insertedWidget = widgetRepository.insert(generateV1InsertWidgetModel()).getValue();
 
-        var getByIdResult = widgetRepository.v1GetById(insertedWidget.getId());
+        var getByIdResult = widgetRepository.getById(insertedWidget.getId());
 
         assertTrue(getByIdResult.isSucceed());
         assertThat(getByIdResult.getValue()).usingRecursiveComparison().isEqualTo(insertedWidget);
@@ -70,9 +70,9 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_be_failed_when_failed_to_get_by_ID() {
-        widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        widgetRepository.insert(generateV1InsertWidgetModel());
 
-        var getByIdResult = widgetRepository.v1GetById(UUID.randomUUID());
+        var getByIdResult = widgetRepository.getById(UUID.randomUUID());
 
         assertTrue(getByIdResult.isFailed());
         assertTrue(getByIdResult.hasError(NotFoundError.class));
@@ -80,9 +80,9 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_successfully_get_by_Z_index() {
-        var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
+        var insertedWidget = widgetRepository.insert(generateV1InsertWidgetModel()).getValue();
 
-        var getByZIndexResult = widgetRepository.v1GetByZIndex(insertedWidget.getZ());
+        var getByZIndexResult = widgetRepository.getByZIndex(insertedWidget.getZ());
 
         assertTrue(getByZIndexResult.isSucceed());
         assertThat(getByZIndexResult.getValue()).usingRecursiveComparison().isEqualTo(insertedWidget);
@@ -90,9 +90,9 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_be_failed_when_failed_to_get_by_Z_index() {
-        widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        widgetRepository.insert(generateV1InsertWidgetModel());
 
-        var getByZResult = widgetRepository.v1GetByZIndex(RandomUtils.nextInt());
+        var getByZResult = widgetRepository.getByZIndex(RandomUtils.nextInt());
 
         assertTrue(getByZResult.isFailed());
         assertTrue(getByZResult.hasError(NotFoundError.class));
@@ -100,9 +100,9 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_successfully_get_all_inserted_widgets() {
-        var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
+        var insertedWidget = widgetRepository.insert(generateV1InsertWidgetModel()).getValue();
 
-        var getAllResult = widgetRepository.v1GetRange(1, 10);
+        var getAllResult = widgetRepository.getRange(1, 10);
 
         assertTrue(getAllResult.isSucceed());
         assertThat(getAllResult.getValue().getWidgets().size()).isEqualTo(1);
@@ -111,10 +111,10 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_successfully_update() {
-        var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
+        var insertedWidget = widgetRepository.insert(generateV1InsertWidgetModel()).getValue();
 
         var updatingModel = generateV1UpdateWidgetModel(insertedWidget.getId());
-        var updatingResult = widgetRepository.v1Update(updatingModel);
+        var updatingResult = widgetRepository.update(updatingModel);
 
         assertTrue(updatingResult.isSucceed());
         assertThat(updatingResult.getValue().getId()).isEqualTo(insertedWidget.getId());
@@ -134,21 +134,21 @@ public class InMemoryRepositoryTests {
 
         assertThat(updatingResult.getValue())
             .usingRecursiveComparison()
-            .isEqualTo(widgetRepository.v1GetById(updatingModel.getId()).getValue());
+            .isEqualTo(widgetRepository.getById(updatingModel.getId()).getValue());
         assertThat(updatingResult.getValue())
             .usingRecursiveComparison()
-            .isEqualTo(widgetRepository.v1GetByZIndex(updatingModel.getZ()).getValue());
+            .isEqualTo(widgetRepository.getByZIndex(updatingModel.getZ()).getValue());
         assertThat(updatingResult.getValue())
             .usingRecursiveComparison()
-            .isEqualTo(widgetRepository.v1GetRange(1, 10).getValue().getWidgets().get(0));
+            .isEqualTo(widgetRepository.getRange(1, 10).getValue().getWidgets().get(0));
     }
 
     @Test
     public void should_be_failed_when_failed_to_update() {
-        widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        widgetRepository.insert(generateV1InsertWidgetModel());
 
         var updatingModel = generateV1UpdateWidgetModel(UUID.randomUUID());
-        var updatingResult = widgetRepository.v1Update(updatingModel);
+        var updatingResult = widgetRepository.update(updatingModel);
 
         assertTrue(updatingResult.isFailed());
         assertTrue(updatingResult.hasError(NotFoundError.class));
@@ -156,11 +156,11 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_successfully_delete_by_ID() {
-        var insertedWidget = widgetRepository.v1Insert(generateV1InsertWidgetModel()).getValue();
+        var insertedWidget = widgetRepository.insert(generateV1InsertWidgetModel()).getValue();
 
-        var deletingResult = widgetRepository.v1Delete(insertedWidget.getId());
+        var deletingResult = widgetRepository.delete(insertedWidget.getId());
 
-        var getAllResult = widgetRepository.v1GetRange(1, 10);
+        var getAllResult = widgetRepository.getRange(1, 10);
 
         assertTrue(deletingResult.isSucceed());
         assertTrue(getAllResult.isSucceed());
@@ -169,9 +169,9 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_be_failed_when_failed_to_delete_by_ID() {
-        widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        widgetRepository.insert(generateV1InsertWidgetModel());
 
-        var deletingResult = widgetRepository.v1Delete(UUID.randomUUID());
+        var deletingResult = widgetRepository.delete(UUID.randomUUID());
 
         assertTrue(deletingResult.isFailed());
         assertTrue(deletingResult.hasError(NotFoundError.class));
@@ -179,11 +179,11 @@ public class InMemoryRepositoryTests {
 
     @Test
     public void should_successfully_delete_all() {
-        widgetRepository.v1Insert(generateV1InsertWidgetModel());
+        widgetRepository.insert(generateV1InsertWidgetModel());
 
-        var deletingResult = widgetRepository.v1DeleteAll();
+        var deletingResult = widgetRepository.deleteAll();
 
-        var getAllResult = widgetRepository.v1GetRange(1, 10);
+        var getAllResult = widgetRepository.getRange(1, 10);
 
         assertTrue(deletingResult.isSucceed());
         assertTrue(getAllResult.isSucceed());

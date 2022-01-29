@@ -15,6 +15,6 @@ public class V1GetAllWidgetsResponse {
 
     @NotNull
     @Schema(name = "widgets", description = "range of widgets")
-    Iterable<V1GetAllWidgetsItem> Widgets;
+    Iterable<V1GetRangeItem> Widgets;
 }
 

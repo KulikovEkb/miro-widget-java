@@ -1,10 +1,8 @@
 package com.miro.widget.mappers;
 
-import com.miro.widget.service.models.V1CoordinatesDto;
-import com.miro.widget.service.models.V1SizeDto;
-import com.miro.widget.service.models.V1WidgetDto;
-import com.miro.widget.service.repositories.models.V1InsertWidgetModel;
-import com.miro.widget.service.repositories.models.V1WidgetEntity;
+import com.miro.widget.service.models.widget.*;
+import com.miro.widget.service.repositories.models.params.InsertWidgetParams;
+import com.miro.widget.service.repositories.models.WidgetEntity;
 import org.mapstruct.Mapper;
 
 import java.time.ZonedDateTime;
@@ -12,23 +10,23 @@ import java.util.UUID;
 
 @Mapper(componentModel = "spring")
 public abstract class BllAndDalMapper {
-    public V1WidgetDto v1EntityToDto(V1WidgetEntity entity) {
-        return new V1WidgetDto(
+    public Widget entityToBllModel(WidgetEntity entity) {
+        return new Widget(
             entity.getId(),
             entity.getZ(),
-            new V1CoordinatesDto(
+            new Coordinates(
                 entity.getCenterX(),
                 entity.getCenterY()
             ),
-            new V1SizeDto(
+            new Size(
                 entity.getWidth(),
                 entity.getHeight()
             ),
             entity.getUpdatedAt());
     }
 
-    public V1WidgetEntity v1InsertModelToEntity(V1InsertWidgetModel model) {
-        return new V1WidgetEntity(
+    public WidgetEntity insertionParamsToEntity(InsertWidgetParams model) {
+        return new WidgetEntity(
             UUID.randomUUID(),
             model.getZ(),
             model.getCenterX(),

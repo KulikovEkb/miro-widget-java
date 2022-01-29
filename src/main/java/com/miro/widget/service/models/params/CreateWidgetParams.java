@@ -1,10 +1,10 @@
-package com.miro.widget.service.models;
+package com.miro.widget.service.models.params;
 
 import lombok.*;
 
 @Data
 @AllArgsConstructor
-public class V1CreateWidgetDto {
+public class CreateWidgetParams {
     @NonNull
     Integer centerX;
 

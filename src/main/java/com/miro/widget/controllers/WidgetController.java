@@ -53,7 +53,7 @@ public class WidgetController {
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
     public ResponseEntity<?> v1Create(@RequestBody @NotNull @Valid V1CreateWidgetRequest request) {
-        var createWidgetResult = widgetService.v1Create(mapper.v1CreateRequestToDto(request));
+        var createWidgetResult = widgetService.create(mapper.v1CreateRequestToBllModel(request));
 
         if (createWidgetResult.isFailed())
             return ResponseEntity.internalServerError().body(createWidgetResult.getError());
@@ -65,7 +65,7 @@ public class WidgetController {
 
         return ResponseEntity
             .created(uri)
-            .body(mapper.v1DtoToCreationResponse(createWidgetResult.getValue()));
+            .body(mapper.bllModelToV1CreationResponse(createWidgetResult.getValue()));
     }
 
     @GetMapping(path = "{id}")
@@ -79,7 +79,7 @@ public class WidgetController {
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
     public ResponseEntity<?> v1GetById(@PathVariable @NotNull UUID id) {
-        var getWidgetResult = widgetService.v1GetById(id);
+        var getWidgetResult = widgetService.getById(id);
 
         if (getWidgetResult.hasError(NotFoundError.class))
             return ResponseEntity.notFound().build();
@@ -87,7 +87,7 @@ public class WidgetController {
         if (getWidgetResult.isFailed())
             return ResponseEntity.internalServerError().body(getWidgetResult.getError());
 
-        return ResponseEntity.ok(mapper.v1DtoToGetByIdResponse(getWidgetResult.getValue()));
+        return ResponseEntity.ok(mapper.bllModelToV1GetByIdResponse(getWidgetResult.getValue()));
     }
 
     @GetMapping
@@ -103,7 +103,7 @@ public class WidgetController {
     public ResponseEntity<?> v1GetRange(
         @RequestParam(defaultValue = "1") @Min(1) @Max(Integer.MAX_VALUE) int page,
         @RequestParam(defaultValue = "10") @Min(1) @Max(500) int size) {
-        var getWidgetsResult = widgetService.v1GetRange(page, size);
+        var getWidgetsResult = widgetService.getRange(page, size);
 
         if (getWidgetsResult.isFailed())
             return ResponseEntity.internalServerError().body(getWidgetsResult.getError());
@@ -113,7 +113,7 @@ public class WidgetController {
             getWidgetsResult.getValue().getTotalPagesCount(),
             getWidgetsResult.getValue().getWidgets()
             .stream()
-            .map(mapper::v1DtoToGetAllItem)
+            .map(mapper::bllModelToV1GetRangeItem)
             .collect(toList())));
     }
 
@@ -133,7 +133,7 @@ public class WidgetController {
     })
     public ResponseEntity<?> v1Update(
         @NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody V1UpdateWidgetRequest request) {
-        var updateWidgetResult = widgetService.v1Update(id, mapper.v1UpdateRequestToDto(request));
+        var updateWidgetResult = widgetService.update(id, mapper.v1UpdateRequestToBllModel(request));
 
         if (request.getCenterX() == null &&
             request.getCenterY() == null &&
@@ -149,7 +149,7 @@ public class WidgetController {
         if (updateWidgetResult.isFailed())
             return ResponseEntity.internalServerError().body(updateWidgetResult.getError());
 
-        return ResponseEntity.ok(mapper.v1DtoToUpdatingResponse(updateWidgetResult.getValue()));
+        return ResponseEntity.ok(mapper.bllModelToV1UpdatingResponse(updateWidgetResult.getValue()));
     }
 
     @DeleteMapping(path = "{id}")
@@ -162,7 +162,7 @@ public class WidgetController {
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
     public ResponseEntity<?> v1Delete(@NotNull @PathVariable UUID id) {
-        var deleteWidgetResult = widgetService.v1Delete(id);
+        var deleteWidgetResult = widgetService.delete(id);
 
         if (deleteWidgetResult.hasError(NotFoundError.class))
             return ResponseEntity.notFound().build();
