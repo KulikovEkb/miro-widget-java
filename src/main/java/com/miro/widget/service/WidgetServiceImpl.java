@@ -9,6 +9,8 @@ import com.miro.widget.service.repositories.models.V1UpdateWidgetModel;
 import com.miro.widget.service.models.V1WidgetRangeDto;
 import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import result.PlainResult;
 import result.Result;
@@ -17,9 +19,11 @@ import result.errors.Error;
 import java.util.UUID;
 
 @Service
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class WidgetServiceImpl implements WidgetService {
-    private static int nextMaxIndex;
     private final WidgetRepository widgetRepository;
+
+    private int nextMaxIndex;
 
     @Autowired
     public WidgetServiceImpl(WidgetRepository widgetRepository) {
@@ -51,12 +55,10 @@ public class WidgetServiceImpl implements WidgetService {
         ));
     }
 
-    @Synchronized
     public Result<V1WidgetDto> v1GetById(UUID id) {
         return widgetRepository.v1GetById(id);
     }
 
-    @Synchronized
     public Result<V1WidgetRangeDto> v1GetRange(int page, int size) {
         return widgetRepository.v1GetRange(page, size);
     }

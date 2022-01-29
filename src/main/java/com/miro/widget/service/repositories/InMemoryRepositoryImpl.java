@@ -6,6 +6,8 @@ import com.miro.widget.service.repositories.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 import result.PlainResult;
 import result.Result;
@@ -21,16 +23,19 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 @Repository
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class InMemoryRepositoryImpl implements WidgetRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryRepositoryImpl.class);
-    private static final ConcurrentMap<UUID, V1WidgetEntity> idToWidgetMap = new ConcurrentHashMap<>();
-    private static final ConcurrentNavigableMap<Integer, V1WidgetEntity> zIndexToWidgetMap =
-        new ConcurrentSkipListMap<>();
+
+    private final ConcurrentMap<UUID, V1WidgetEntity> idToWidgetMap;
+    private final ConcurrentNavigableMap<Integer, V1WidgetEntity> zIndexToWidgetMap;
 
     private final BllAndDalMapper mapper;
 
     @Autowired
     public InMemoryRepositoryImpl(BllAndDalMapper mapper) {
+        idToWidgetMap = new ConcurrentHashMap<>();
+        zIndexToWidgetMap = new ConcurrentSkipListMap<>();
         this.mapper = mapper;
     }
 
