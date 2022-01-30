@@ -102,7 +102,8 @@ public class WidgetServiceImpl implements WidgetService {
         for (var i = startIndex + 1; getSwapItemResult.isSucceed() && i <= endIndex; i++) {
             var tempItem = widgetRepository.getByZIndex(i);
 
-            widgetRepository.update(new com.miro.widget.service.repositories.models.params.UpdateWidgetParams(getSwapItemResult.getValue().getId(), i));
+            widgetRepository.update(new com.miro.widget.service.repositories.models.params.UpdateWidgetParams(
+                getSwapItemResult.getValue().getId(), i));
 
             getSwapItemResult = tempItem;
 

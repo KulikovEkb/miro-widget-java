@@ -2,6 +2,7 @@ package com.miro.widget.mappers;
 
 import com.miro.widget.controllers.models.requests.*;
 import com.miro.widget.controllers.models.responses.*;
+import com.miro.widget.service.models.Widget2;
 import com.miro.widget.service.models.params.*;
 import com.miro.widget.service.models.widget.Widget;
 import org.mapstruct.Mapper;
@@ -44,6 +45,22 @@ public abstract class WebAndBllMapper {
         );
     }
 
+    public V1CreateWidgetResponse bllModelToV1CreationResponse(Widget2 bllModel) {
+        return new V1CreateWidgetResponse(
+            bllModel.getId(),
+            bllModel.getZ(),
+            new V1Coordinates(
+                bllModel.getCenterX(),
+                bllModel.getCenterY()
+            ),
+            new V1Size(
+                bllModel.getWidth(),
+                bllModel.getHeight()
+            ),
+            bllModel.getUpdatedAt()
+        );
+    }
+
     public V1UpdateWidgetResponse bllModelToV1UpdatingResponse(Widget bllModel) {
         return new V1UpdateWidgetResponse(
             bllModel.getId(),
@@ -71,6 +88,22 @@ public abstract class WebAndBllMapper {
             new V1Size(
                 bllModel.getSize().getWidth(),
                 bllModel.getSize().getHeight()
+            ),
+            bllModel.getUpdatedAt()
+        );
+    }
+
+    public V2WidgetDto bllModelToDto(Widget2 bllModel) {
+        return new V2WidgetDto(
+            bllModel.getId(),
+            bllModel.getZ(),
+            new V1Coordinates(
+                bllModel.getCenterX(),
+                bllModel.getCenterY()
+            ),
+            new V1Size(
+                bllModel.getWidth(),
+                bllModel.getHeight()
             ),
             bllModel.getUpdatedAt()
         );
