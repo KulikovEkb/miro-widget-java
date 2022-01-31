@@ -1,5 +1,6 @@
 package com.miro.widget.service.repositories;
 
+import com.miro.widget.exceptions.WidgetNotFoundException;
 import com.miro.widget.service.models.Widget2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 @Repository
@@ -35,7 +39,7 @@ public class InMemoryRepositoryImpl2 implements WidgetRepository2 {
     }
 
     @Override
-    public <S extends Widget2> S save(S widget) {
+    public Widget2 save(Widget2 widget) {
         var existingWidget = idToWidgetMap.getOrDefault(widget.getId(), null);
 
         if (existingWidget != null
@@ -44,12 +48,20 @@ public class InMemoryRepositoryImpl2 implements WidgetRepository2 {
             zIndexToWidgetMap.remove(existingWidget.getZ());
         }
 
-        widget.setUpdatedAt(ZonedDateTime.now());
+        var newWidget = new Widget2(
+            widget.getId(),
+            widget.getZ(),
+            widget.getCenterX(),
+            widget.getCenterY(),
+            widget.getWidth(),
+            widget.getHeight(),
+            ZonedDateTime.now()
+        );
 
-        idToWidgetMap.put(widget.getId(), widget);
-        zIndexToWidgetMap.put(widget.getZ(), widget);
+        idToWidgetMap.put(widget.getId(), newWidget);
+        zIndexToWidgetMap.put(widget.getZ(), newWidget);
 
-        return widget;
+        return newWidget;
     }
 
     @Override
@@ -57,18 +69,44 @@ public class InMemoryRepositoryImpl2 implements WidgetRepository2 {
         var result = new ArrayList<S>();
 
         for (var widget : widgets) {
-            result.add(save(widget));
+            result.add((S) save(widget));
         }
 
         return result;
     }
 
     public Optional<Widget2> findById(UUID id) {
-        return Optional.ofNullable(idToWidgetMap.getOrDefault(id, null));
+        var widget = idToWidgetMap.getOrDefault(id, null);
+
+        if (widget == null)
+            return Optional.empty();
+
+        return Optional.of(new Widget2(
+            widget.getId(),
+            widget.getZ(),
+            widget.getCenterX(),
+            widget.getCenterY(),
+            widget.getWidth(),
+            widget.getHeight(),
+            widget.getUpdatedAt()
+        ));
     }
 
     public Optional<Widget2> findByZ(int z) {
-        return Optional.ofNullable(zIndexToWidgetMap.getOrDefault(z, null));
+        var widget = zIndexToWidgetMap.getOrDefault(z, null);
+
+        if (widget == null)
+            return Optional.empty();
+
+        return Optional.of(new Widget2(
+            widget.getId(),
+            widget.getZ(),
+            widget.getCenterX(),
+            widget.getCenterY(),
+            widget.getWidth(),
+            widget.getHeight(),
+            widget.getUpdatedAt()
+        ));
     }
 
     @Override
@@ -78,7 +116,18 @@ public class InMemoryRepositoryImpl2 implements WidgetRepository2 {
 
     @Override
     public Iterable<Widget2> findAll() {
-        return zIndexToWidgetMap.values();
+        return zIndexToWidgetMap
+            .values()
+            .stream()
+            .map(x -> new Widget2(
+                x.getId(),
+                x.getZ(),
+                x.getCenterX(),
+                x.getCenterY(),
+                x.getWidth(),
+                x.getHeight(),
+                x.getUpdatedAt()))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -99,15 +148,33 @@ public class InMemoryRepositoryImpl2 implements WidgetRepository2 {
 
     public void deleteById(UUID id) {
         var removedByIdWidget = idToWidgetMap.remove(id);
+        if (removedByIdWidget == null) {
+            var message = String.format("Widget with id '%s' not found", id);
+            log.warn(message);
+            throw new WidgetNotFoundException(message);
+        }
 
-        zIndexToWidgetMap.remove(removedByIdWidget.getZ());
+        var removedByZIndexWidget = zIndexToWidgetMap.remove(removedByIdWidget.getZ());
+        if (removedByZIndexWidget == null) {
+            var message = String.format(
+                "Widget with z index '%d' wasn't found while one with ID '%s' was", removedByIdWidget.getZ(), id);
+            log.error(message);
+            throw new WidgetNotFoundException(message);
+        }
+
+        if (!removedByIdWidget.equals(removedByZIndexWidget)) {
+            var message = String.format(
+                "Widget deleted by ID is not the same as deleted by z index. First: %s, second: %s",
+                removedByIdWidget,
+                removedByZIndexWidget);
+            log.error(message);
+            throw new WidgetNotFoundException(message);
+        }
     }
 
     @Override
     public void delete(Widget2 widget) {
-        var removedByIdWidget = idToWidgetMap.remove(widget.getId());
-
-        zIndexToWidgetMap.remove(removedByIdWidget.getZ());
+        deleteById(widget.getId());
     }
 
     @Override
@@ -120,7 +187,7 @@ public class InMemoryRepositoryImpl2 implements WidgetRepository2 {
     @Override
     public void deleteAll(Iterable<? extends Widget2> widgets) {
         for (var widget : widgets) {
-            delete(widget);
+            deleteById(widget.getId());
         }
     }
 
@@ -138,6 +205,15 @@ public class InMemoryRepositoryImpl2 implements WidgetRepository2 {
             .stream()
             .skip((long) pageable.getPageNumber() * pageable.getPageSize())
             .limit(pageable.getPageSize())
+            .map(x -> new Widget2(
+                x.getId(),
+                x.getZ(),
+                x.getCenterX(),
+                x.getCenterY(),
+                x.getWidth(),
+                x.getHeight(),
+                x.getUpdatedAt()
+            ))
             .collect(Collectors.toList());
 
         return new PageImpl<>(pageWidgets, pageable, allWidgetsCount);

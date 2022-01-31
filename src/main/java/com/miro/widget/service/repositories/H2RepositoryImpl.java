@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Profile("h2-repository")
 public interface H2RepositoryImpl extends WidgetRepository2 {
-    @Query(value = "SELECT * FROM widgets", nativeQuery = true, countQuery = "select count(id) from widgets")
+    @Query(
+        value = "SELECT * FROM widgets ORDER BY z",
+        nativeQuery = true,
+        countQuery = "select count(id) from widgets")
     Page<Widget2> findAll(Pageable pageable);
 }

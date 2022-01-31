@@ -9,6 +9,7 @@ import lombok.Synchronized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -100,7 +101,11 @@ public class WidgetServiceImpl2 implements WidgetService2 {
 
     @Synchronized
     public void delete(UUID id) {
-        widgetRepository.deleteById(id);
+        try {
+            widgetRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException exc) {
+            throw new WidgetNotFoundException(exc.getMessage());
+        }
     }
 
     void shift(int startIndex) {
