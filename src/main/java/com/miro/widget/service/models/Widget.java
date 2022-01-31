@@ -14,7 +14,7 @@ import java.util.UUID;
 @Table(name = "widgets")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Widget2 {
+public class Widget {
     @Id
     @NonNull
     UUID id;

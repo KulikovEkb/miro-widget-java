@@ -1,9 +1,10 @@
 package com.miro.widget.functional;
 
-import com.miro.widget.service.WidgetService2;
-import com.miro.widget.service.WidgetServiceImpl2;
-import com.miro.widget.service.repositories.InMemoryRepositoryImpl2;
-import com.miro.widget.service.repositories.WidgetRepository2;
+import com.miro.widget.mappers.WidgetsMapperImpl;
+import com.miro.widget.service.WidgetService;
+import com.miro.widget.service.WidgetServiceImpl;
+import com.miro.widget.service.repositories.InMemoryRepositoryImpl;
+import com.miro.widget.service.repositories.WidgetRepository;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,19 +14,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static com.miro.widget.helpers.Generator2.*;
+import static com.miro.widget.helpers.Generator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 public class WidgetServiceCreationTests {
-    WidgetRepository2 widgetRepository;
-    WidgetService2 widgetService;
+    WidgetRepository widgetRepository;
+    WidgetService widgetService;
 
     @BeforeEach
     public void setUp() {
-        widgetRepository = new InMemoryRepositoryImpl2();
-        widgetService = new WidgetServiceImpl2(widgetRepository);
+        widgetRepository = new InMemoryRepositoryImpl();
+        widgetService = new WidgetServiceImpl(new WidgetsMapperImpl(), widgetRepository);
     }
 
     @AfterEach

@@ -1,8 +1,9 @@
 package com.miro.widget;
 
 import com.miro.widget.exceptions.WidgetNotFoundException;
-import com.miro.widget.service.WidgetServiceImpl2;
-import com.miro.widget.service.repositories.WidgetRepository2;
+import com.miro.widget.mappers.WidgetsMapperImpl;
+import com.miro.widget.service.WidgetServiceImpl;
+import com.miro.widget.service.repositories.WidgetRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,20 +18,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.miro.widget.helpers.Generator2.*;
+import static com.miro.widget.helpers.Generator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class WidgetServiceTests {
-    private final WidgetRepository2 widgetRepository = Mockito.mock(WidgetRepository2.class);
+    private final WidgetRepository widgetRepository = Mockito.mock(WidgetRepository.class);
 
-    WidgetServiceImpl2 widgetService;
+    WidgetServiceImpl widgetService;
 
     @BeforeEach
     public void setUp() {
-        widgetService = new WidgetServiceImpl2(widgetRepository);
+        widgetService = new WidgetServiceImpl(new WidgetsMapperImpl(), widgetRepository);
     }
 
     @Test

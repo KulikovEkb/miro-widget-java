@@ -1,26 +1,17 @@
 package com.miro.widget.service.repositories;
 
-import com.miro.widget.service.models.widget.Widget;
-import com.miro.widget.service.repositories.models.params.InsertWidgetParams;
-import com.miro.widget.service.repositories.models.params.UpdateWidgetParams;
-import com.miro.widget.service.models.WidgetRange;
-import result.PlainResult;
-import result.Result;
+import com.miro.widget.service.models.Widget;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
+import java.util.Optional;
 import java.util.UUID;
 
-public interface WidgetRepository {
-    Result<Widget> insert(InsertWidgetParams model);
+@NoRepositoryBean
+public interface WidgetRepository extends CrudRepository<Widget, UUID> {
+    Optional<Widget> findByZ(int z);
 
-    Result<Widget> getById(UUID id);
-
-    Result<Widget> getByZIndex(int z);
-
-    Result<WidgetRange> getRange(int page, int size);
-
-    Result<Widget> update(UpdateWidgetParams model);
-
-    PlainResult delete(UUID id);
-
-    PlainResult deleteAll();
+    Page<Widget> findAll(Pageable pageable);
 }

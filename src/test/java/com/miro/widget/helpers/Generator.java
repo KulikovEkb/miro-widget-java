@@ -2,18 +2,15 @@ package com.miro.widget.helpers;
 
 import com.miro.widget.controllers.models.requests.V1CreateWidgetRequest;
 import com.miro.widget.controllers.models.requests.V1UpdateWidgetRequest;
-import com.miro.widget.service.models.Widget2;
+import com.miro.widget.service.models.Widget;
 import com.miro.widget.service.models.params.CreateWidgetParams;
 import com.miro.widget.service.models.params.UpdateWidgetParams;
-import com.miro.widget.service.models.widget.Coordinates;
-import com.miro.widget.service.models.widget.Size;
-import com.miro.widget.service.models.widget.Widget;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-public class Generator2 {
+public class Generator {
     public static CreateWidgetParams generateCreationParams() {
         return generateCreationParams(RandomUtils.nextInt());
     }
@@ -27,8 +24,8 @@ public class Generator2 {
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }
 
-    public static Widget2 generateWidget() {
-        return new Widget2(
+    public static Widget generateWidget() {
+        return new Widget(
             UUID.randomUUID(),
             RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
             RandomUtils.nextInt(),
@@ -38,8 +35,8 @@ public class Generator2 {
             ZonedDateTime.now());
     }
 
-    public static Widget2 convertFromWidgetToWidget(Widget2 existing, Integer z) {
-        return new Widget2(
+    public static Widget convertFromWidgetToWidget(Widget existing, Integer z) {
+        return new Widget(
             existing.getId(),
             z,
             existing.getCenterX(),
@@ -49,8 +46,8 @@ public class Generator2 {
             existing.getUpdatedAt());
     }
 
-    public static Widget2 convertToWidgetFromCreationParams(CreateWidgetParams dto) {
-        return new Widget2(
+    public static Widget convertToWidgetFromCreationParams(CreateWidgetParams dto) {
+        return new Widget(
             UUID.randomUUID(),
             dto.getZ(),
             dto.getCenterX(),
@@ -78,8 +75,8 @@ public class Generator2 {
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }
 
-    public static Widget2 convertToWidgetFromUpdatingDto(UUID id, UpdateWidgetParams dto) {
-        return new Widget2(
+    public static Widget convertToWidgetFromUpdatingDto(UUID id, UpdateWidgetParams dto) {
+        return new Widget(
             id,
             dto.getZ(),
             dto.getCenterX(),
@@ -98,8 +95,8 @@ public class Generator2 {
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }
 
-    public static Widget2 convertToWidgetFromCreateRequest(UUID id, V1CreateWidgetRequest request) {
-        return new Widget2(
+    public static Widget convertToWidgetFromCreateRequest(UUID id, V1CreateWidgetRequest request) {
+        return new Widget(
             id,
             request.getZ(),
             request.getCenterX(),
@@ -118,8 +115,8 @@ public class Generator2 {
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }
 
-    public static Widget2 convertToWidgetFromUpdateRequest(UUID id, V1UpdateWidgetRequest request) {
-        return new Widget2(
+    public static Widget convertToWidgetFromUpdateRequest(UUID id, V1UpdateWidgetRequest request) {
+        return new Widget(
             id,
             request.getZ(),
             request.getCenterX(),
@@ -129,8 +126,8 @@ public class Generator2 {
             ZonedDateTime.now());
     }
 
-    public static Widget2 generateWidgetForInsert() {
-        return new Widget2(
+    public static Widget generateWidgetForInsert() {
+        return new Widget(
             UUID.randomUUID(),
             RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
             RandomUtils.nextInt(),
@@ -140,8 +137,8 @@ public class Generator2 {
             null);
     }
 
-    public static Widget2 generateWidgetForUpdate(UUID id) {
-        return new Widget2(
+    public static Widget generateWidgetForUpdate(UUID id) {
+        return new Widget(
             id,
             RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
             RandomUtils.nextInt(),

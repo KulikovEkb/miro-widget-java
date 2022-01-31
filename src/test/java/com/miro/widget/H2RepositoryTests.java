@@ -1,14 +1,9 @@
 package com.miro.widget;
 
-import com.miro.widget.exceptions.WidgetNotFoundException;
-import com.miro.widget.service.repositories.InMemoryRepositoryImpl2;
-import com.miro.widget.service.repositories.WidgetRepository2;
+import com.miro.widget.service.repositories.WidgetRepository;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -18,8 +13,8 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static com.miro.widget.helpers.Generator2.generateWidgetForInsert;
-import static com.miro.widget.helpers.Generator2.generateWidgetForUpdate;
+import static com.miro.widget.helpers.Generator.generateWidgetForInsert;
+import static com.miro.widget.helpers.Generator.generateWidgetForUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("h2-repository")
 public class H2RepositoryTests {
     @Autowired
-    private WidgetRepository2 widgetRepository;
+    private WidgetRepository widgetRepository;
 
     @AfterEach
     public void tearDown() {

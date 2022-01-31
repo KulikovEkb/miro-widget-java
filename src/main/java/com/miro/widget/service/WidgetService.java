@@ -1,22 +1,22 @@
 package com.miro.widget.service;
 
-import com.miro.widget.service.models.*;
+import com.miro.widget.exceptions.WidgetNotFoundException;
+import com.miro.widget.service.models.Widget;
 import com.miro.widget.service.models.params.CreateWidgetParams;
 import com.miro.widget.service.models.params.UpdateWidgetParams;
-import com.miro.widget.service.models.widget.Widget;
-import result.PlainResult;
-import result.Result;
+import org.springframework.data.domain.Page;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface WidgetService {
-    Result<Widget> create(CreateWidgetParams dto);
+    Widget create(CreateWidgetParams dto);
 
-    Result<Widget> getById(UUID id);
+    Optional<Widget> findById(UUID id);
 
-    Result<WidgetRange> getRange(int page, int size);
+    Page<Widget> findRange(int page, int size);
 
-    Result<Widget> update(UUID id, UpdateWidgetParams dto);
+    Widget update(UUID id, UpdateWidgetParams dto) throws WidgetNotFoundException;
 
-    PlainResult delete(UUID id);
+    void delete(UUID id);
 }

@@ -1,8 +1,8 @@
 package com.miro.widget;
 
 import com.miro.widget.exceptions.WidgetNotFoundException;
-import com.miro.widget.service.repositories.InMemoryRepositoryImpl2;
-import com.miro.widget.service.repositories.WidgetRepository2;
+import com.miro.widget.service.repositories.InMemoryRepositoryImpl;
+import com.miro.widget.service.repositories.WidgetRepository;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,18 +14,18 @@ import org.springframework.data.domain.PageRequest;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static com.miro.widget.helpers.Generator2.generateWidgetForInsert;
-import static com.miro.widget.helpers.Generator2.generateWidgetForUpdate;
+import static com.miro.widget.helpers.Generator.generateWidgetForInsert;
+import static com.miro.widget.helpers.Generator.generateWidgetForUpdate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class InMemoryRepositoryTests {
-    private WidgetRepository2 widgetRepository;
+    private WidgetRepository widgetRepository;
 
     @BeforeEach
     public void setUp() {
-        widgetRepository = new InMemoryRepositoryImpl2();
+        widgetRepository = new InMemoryRepositoryImpl();
     }
 
     @AfterEach

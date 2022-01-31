@@ -1,12 +1,12 @@
 package com.miro.widget;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.miro.widget.controllers.WidgetController2;
+import com.miro.widget.controllers.WidgetController;
 import com.miro.widget.controllers.models.requests.V1CreateWidgetRequest;
 import com.miro.widget.controllers.models.requests.V1UpdateWidgetRequest;
 import com.miro.widget.exceptions.WidgetNotFoundException;
-import com.miro.widget.mappers.WebAndBllMapper;
-import com.miro.widget.service.WidgetService2;
+import com.miro.widget.mappers.WidgetsMapper;
+import com.miro.widget.service.WidgetService;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,14 +23,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.miro.widget.helpers.Generator2.*;
+import static com.miro.widget.helpers.Generator.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = WidgetController2.class)
+@WebMvcTest(controllers = WidgetController.class)
 public class WidgetControllerTests {
     @Autowired
     private MockMvc mockMvc;
@@ -39,10 +39,10 @@ public class WidgetControllerTests {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private WebAndBllMapper webAndBllMapper;
+    private WidgetsMapper webAndBllMapper;
 
     @MockBean
-    private WidgetService2 widgetService;
+    private WidgetService widgetService;
 
     @Test
     public void v1_create_should_return_201() throws Exception {
@@ -51,7 +51,7 @@ public class WidgetControllerTests {
 
         Mockito.when(widgetService.create(any())).thenReturn(widgetDto);
 
-        mockMvc.perform(post("/api/v2/widgets")
+        mockMvc.perform(post("/api/v1/widgets")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated());
@@ -63,7 +63,7 @@ public class WidgetControllerTests {
 
         Mockito.when(widgetService.create(any())).thenThrow(IllegalArgumentException.class);
 
-        mockMvc.perform(post("/api/v2/widgets")
+        mockMvc.perform(post("/api/v1/widgets")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isInternalServerError());
@@ -78,7 +78,7 @@ public class WidgetControllerTests {
             RandomUtils.nextInt(1, Integer.MAX_VALUE),
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
 
-        mockMvc.perform(post("/api/v2/widgets")
+        mockMvc.perform(post("/api/v1/widgets")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest());
@@ -93,7 +93,7 @@ public class WidgetControllerTests {
             RandomUtils.nextInt(1, Integer.MAX_VALUE),
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
 
-        mockMvc.perform(post("/api/v2/widgets")
+        mockMvc.perform(post("/api/v1/widgets")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest());
@@ -108,7 +108,7 @@ public class WidgetControllerTests {
             RandomUtils.nextInt(1, Integer.MAX_VALUE),
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
 
-        mockMvc.perform(post("/api/v2/widgets")
+        mockMvc.perform(post("/api/v1/widgets")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest());
@@ -123,7 +123,7 @@ public class WidgetControllerTests {
             -1,
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
 
-        mockMvc.perform(post("/api/v2/widgets")
+        mockMvc.perform(post("/api/v1/widgets")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest());
@@ -138,7 +138,7 @@ public class WidgetControllerTests {
             RandomUtils.nextInt(1, Integer.MAX_VALUE),
             -2);
 
-        mockMvc.perform(post("/api/v2/widgets")
+        mockMvc.perform(post("/api/v1/widgets")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest());
@@ -150,7 +150,7 @@ public class WidgetControllerTests {
 
         Mockito.when(widgetService.findById(widgetId)).thenReturn(Optional.of(generateWidget()));
 
-        mockMvc.perform(get("/api/v2/widgets/" + widgetId)).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/widgets/" + widgetId)).andExpect(status().isOk());
     }
 
     @Test
@@ -159,12 +159,12 @@ public class WidgetControllerTests {
 
         Mockito.when(widgetService.findById(argThat(x -> x.equals(widgetId)))).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/api/v2/widgets/" + widgetId)).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/widgets/" + widgetId)).andExpect(status().isNotFound());
     }
 
     @Test
     public void v1_get_by_ID_should_return_400() throws Exception {
-        mockMvc.perform(get("/api/v2/widgets/" + null)).andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/v1/widgets/" + null)).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -172,7 +172,7 @@ public class WidgetControllerTests {
         Mockito.when(widgetService.findRange(anyInt(), anyInt()))
             .thenReturn(new PageImpl<>(List.of(generateWidget())));
 
-        mockMvc.perform(get("/api/v2/widgets")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/widgets")).andExpect(status().isOk());
     }
 
     @Test
@@ -182,7 +182,7 @@ public class WidgetControllerTests {
 
         Mockito.when(widgetService.update(any(), any())).thenReturn(widget);
 
-        mockMvc.perform(put("/api/v2/widgets/" + widget.getId())
+        mockMvc.perform(put("/api/v1/widgets/" + widget.getId())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk());
@@ -192,7 +192,7 @@ public class WidgetControllerTests {
     public void v1_update_should_return_404() throws Exception {
         Mockito.when(widgetService.update(any(), any())).thenThrow(WidgetNotFoundException.class);
 
-        mockMvc.perform(put("/api/v2/widgets/" + UUID.randomUUID())
+        mockMvc.perform(put("/api/v1/widgets/" + UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(generateV1UpdateWidgetRequest())))
             .andExpect(status().isNotFound());
@@ -202,7 +202,7 @@ public class WidgetControllerTests {
     public void v1_update_should_return_500() throws Exception {
         Mockito.when(widgetService.update(any(), any())).thenThrow(IllegalArgumentException.class);
 
-        mockMvc.perform(put("/api/v2/widgets/" + UUID.randomUUID())
+        mockMvc.perform(put("/api/v1/widgets/" + UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(generateV1UpdateWidgetRequest())))
             .andExpect(status().isInternalServerError());
@@ -212,7 +212,7 @@ public class WidgetControllerTests {
     public void v1_update_should_return_400_when_all_values_are_null() throws Exception {
         var request = new V1UpdateWidgetRequest(null, null, null, null, null);
 
-        mockMvc.perform(put("/api/v2/widgets/" + UUID.randomUUID())
+        mockMvc.perform(put("/api/v1/widgets/" + UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest());
@@ -227,7 +227,7 @@ public class WidgetControllerTests {
             RandomUtils.nextInt(1, Integer.MAX_VALUE),
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
 
-        mockMvc.perform(put("/api/v2/widgets/" + UUID.randomUUID())
+        mockMvc.perform(put("/api/v1/widgets/" + UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest());
@@ -242,7 +242,7 @@ public class WidgetControllerTests {
             -1,
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
 
-        mockMvc.perform(put("/api/v2/widgets/" + UUID.randomUUID())
+        mockMvc.perform(put("/api/v1/widgets/" + UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest());
@@ -257,7 +257,7 @@ public class WidgetControllerTests {
             RandomUtils.nextInt(1, Integer.MAX_VALUE),
             -2);
 
-        mockMvc.perform(put("/api/v2/widgets/" + UUID.randomUUID())
+        mockMvc.perform(put("/api/v1/widgets/" + UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest());
@@ -267,7 +267,7 @@ public class WidgetControllerTests {
     public void v1_delete_by_ID_should_return_200() throws Exception {
         var widgetId = UUID.randomUUID();
 
-        mockMvc.perform(delete("/api/v2/widgets/" + widgetId)).andExpect(status().isOk());
+        mockMvc.perform(delete("/api/v1/widgets/" + widgetId)).andExpect(status().isOk());
     }
 
     @Test
@@ -276,7 +276,7 @@ public class WidgetControllerTests {
 
         doThrow(WidgetNotFoundException.class).when(widgetService).delete(widgetId);
 
-        mockMvc.perform(delete("/api/v2/widgets/" + widgetId)).andExpect(status().isNotFound());
+        mockMvc.perform(delete("/api/v1/widgets/" + widgetId)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -285,11 +285,11 @@ public class WidgetControllerTests {
 
         doThrow(IllegalArgumentException.class).when(widgetService).delete(widgetId);
 
-        mockMvc.perform(delete("/api/v2/widgets/" + widgetId)).andExpect(status().isInternalServerError());
+        mockMvc.perform(delete("/api/v1/widgets/" + widgetId)).andExpect(status().isInternalServerError());
     }
 
     @Test
     public void v1_delete_by_ID_should_return_400() throws Exception {
-        mockMvc.perform(delete("/api/v2/widgets/" + null)).andExpect(status().isBadRequest());
+        mockMvc.perform(delete("/api/v1/widgets/" + null)).andExpect(status().isBadRequest());
     }
 }

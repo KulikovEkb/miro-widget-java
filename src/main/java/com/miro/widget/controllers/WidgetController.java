@@ -3,7 +3,8 @@ package com.miro.widget.controllers;
 import com.miro.widget.controllers.models.requests.*;
 import com.miro.widget.controllers.models.responses.*;
 import com.miro.widget.controllers.validation.models.ValidationErrorResponse;
-import com.miro.widget.mappers.WebAndBllMapper;
+import com.miro.widget.exceptions.WidgetNotFoundException;
+import com.miro.widget.mappers.WidgetsMapper;
 import com.miro.widget.service.WidgetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,12 +12,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import result.errors.NotFoundError;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -30,11 +33,11 @@ import static java.util.stream.Collectors.toList;
 @RestController
 @RequestMapping(path = "api/v1/widgets", produces = MediaType.APPLICATION_JSON_VALUE)
 public class WidgetController {
-    private final WebAndBllMapper mapper;
+    private final WidgetsMapper mapper;
     private final WidgetService widgetService;
 
     @Autowired
-    public WidgetController(WebAndBllMapper mapper, WidgetService widgetService) {
+    public WidgetController(WidgetsMapper mapper, WidgetService widgetService) {
         this.mapper = mapper;
         this.widgetService = widgetService;
     }
@@ -46,48 +49,48 @@ public class WidgetController {
         "then the new widget shifts widget with the same (and greater if needed) upwards")
     @ApiResponses(value = {
         @ApiResponse(
-            responseCode = "201", content = @Content(schema = @Schema(implementation = V1CreateWidgetResponse.class))),
+            responseCode = "201", content = @Content(schema = @Schema(implementation = V1WidgetDto.class))),
         @ApiResponse(
             responseCode = "400", description = "BadRequest", content = @Content(
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<?> v1Create(@RequestBody @NotNull @Valid V1CreateWidgetRequest request) {
-        var createWidgetResult = widgetService.create(mapper.v1CreateRequestToBllModel(request));
+    public ResponseEntity<?> create(@RequestBody @NotNull @Valid V1CreateWidgetRequest request) {
+        try {
+            var createdWidget = widgetService.create(mapper.v1CreateRequestToBllModel(request));
 
-        if (createWidgetResult.isFailed())
-            return ResponseEntity.internalServerError().body(createWidgetResult.getError());
+            var uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdWidget.getId())
+                .toUri();
 
-        var uri = ServletUriComponentsBuilder.fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(createWidgetResult.getValue().getId())
-            .toUri();
-
-        return ResponseEntity
-            .created(uri)
-            .body(mapper.bllModelToV1CreationResponse(createWidgetResult.getValue()));
+            return ResponseEntity
+                .created(uri)
+                .body(mapper.bllModelToDto(createdWidget));
+        } catch (WidgetNotFoundException exc) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, exc.getMessage(), exc);
+        } catch (Exception exc) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, exc.getMessage(), exc);
+        }
     }
 
     @GetMapping(path = "{id}")
     @Operation(summary = "Returns the widget by its ID", description = "Returns a complete description of the widget")
     @ApiResponses(value = {
         @ApiResponse(
-            responseCode = "200", content = @Content(schema = @Schema(implementation = V1GetWidgetByIdResponse.class))),
+            responseCode = "200", content = @Content(schema = @Schema(implementation = V1WidgetDto.class))),
         @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content(
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<?> v1GetById(@PathVariable @NotNull UUID id) {
-        var getWidgetResult = widgetService.getById(id);
+    public ResponseEntity<?> getById(@PathVariable @NotNull UUID id) {
+        var foundWidget = widgetService.findById(id);
 
-        if (getWidgetResult.hasError(NotFoundError.class))
+        if (foundWidget.isEmpty())
             return ResponseEntity.notFound().build();
 
-        if (getWidgetResult.isFailed())
-            return ResponseEntity.internalServerError().body(getWidgetResult.getError());
-
-        return ResponseEntity.ok(mapper.bllModelToV1GetByIdResponse(getWidgetResult.getValue()));
+        return ResponseEntity.ok(mapper.bllModelToDto(foundWidget.get()));
     }
 
     @GetMapping
@@ -95,26 +98,23 @@ public class WidgetController {
         "by Z-index, from smallest to largest")
     @ApiResponses(value = {
         @ApiResponse(
-            responseCode = "200", content = @Content(schema = @Schema(implementation = V1GetAllWidgetsResponse.class))),
+            responseCode = "200", content = @Content(schema = @Schema(implementation = V1WidgetDto.class))),
         @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content(
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<?> v1GetRange(
-        @RequestParam(defaultValue = "1") @Min(1) @Max(Integer.MAX_VALUE) int page,
+    public ResponseEntity<?> getRange(
+        @RequestParam(defaultValue = "0") @Min(0) @Max(Integer.MAX_VALUE) int page,
         @RequestParam(defaultValue = "10") @Min(1) @Max(500) int size) {
-        var getWidgetsResult = widgetService.getRange(page, size);
+        var foundWidgets = widgetService.findRange(page, size);
 
-        if (getWidgetsResult.isFailed())
-            return ResponseEntity.internalServerError().body(getWidgetsResult.getError());
-
-        return ResponseEntity.ok(new V1GetAllWidgetsResponse(
-            getWidgetsResult.getValue().getTotalWidgetsCount(),
-            getWidgetsResult.getValue().getTotalPagesCount(),
-            getWidgetsResult.getValue().getWidgets()
-            .stream()
-            .map(mapper::bllModelToV1GetRangeItem)
-            .collect(toList())));
+        return ResponseEntity.ok(new PageImpl<>(
+            foundWidgets.getContent()
+                .stream()
+                .map(mapper::bllModelToDto)
+                .collect(toList()),
+            foundWidgets.getPageable(),
+            foundWidgets.getTotalElements()));
     }
 
     @PutMapping(path = "{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -125,31 +125,31 @@ public class WidgetController {
         "same as when creating a widget")
     @ApiResponses(value = {
         @ApiResponse(
-            responseCode = "200", content = @Content(schema = @Schema(implementation = V1UpdateWidgetResponse.class))),
+            responseCode = "200", content = @Content(schema = @Schema(implementation = V1WidgetDto.class))),
         @ApiResponse(responseCode = "400", description = "BadRequest", content = @Content(
             schema = @Schema(implementation = ValidationErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<?> v1Update(
+    public ResponseEntity<?> update(
         @NotNull @PathVariable UUID id, @Valid @NotNull @RequestBody V1UpdateWidgetRequest request) {
-        var updateWidgetResult = widgetService.update(id, mapper.v1UpdateRequestToBllModel(request));
+        try {
+            var updatedWidget = widgetService.update(id, mapper.v1UpdateRequestToBllModel(request));
 
-        if (request.getCenterX() == null &&
-            request.getCenterY() == null &&
-            request.getWidth() == null &&
-            request.getHeight() == null &&
-            request.getZ() == null) {
-            return ResponseEntity.badRequest().body("There is nothing to update according to the request");
+            if (request.getCenterX() == null &&
+                request.getCenterY() == null &&
+                request.getWidth() == null &&
+                request.getHeight() == null &&
+                request.getZ() == null) {
+                return ResponseEntity.badRequest().body("There is nothing to update according to the request");
+            }
+
+            return ResponseEntity.ok(mapper.bllModelToDto(updatedWidget));
+        } catch (WidgetNotFoundException exc) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, exc.getMessage(), exc);
+        } catch (Exception exc) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, exc.getMessage(), exc);
         }
-
-        if (updateWidgetResult.hasError(NotFoundError.class))
-            return ResponseEntity.notFound().build();
-
-        if (updateWidgetResult.isFailed())
-            return ResponseEntity.internalServerError().body(updateWidgetResult.getError());
-
-        return ResponseEntity.ok(mapper.bllModelToV1UpdatingResponse(updateWidgetResult.getValue()));
     }
 
     @DeleteMapping(path = "{id}")
@@ -161,15 +161,15 @@ public class WidgetController {
         @ApiResponse(responseCode = "404", description = "NotFound", content = @Content()),
         @ApiResponse(responseCode = "500", description = "InternalServerError", content = @Content())
     })
-    public ResponseEntity<?> v1Delete(@NotNull @PathVariable UUID id) {
-        var deleteWidgetResult = widgetService.delete(id);
+    public ResponseEntity<?> delete(@NotNull @PathVariable UUID id) {
+        try {
+            widgetService.delete(id);
 
-        if (deleteWidgetResult.hasError(NotFoundError.class))
-            return ResponseEntity.notFound().build();
-
-        if (deleteWidgetResult.isFailed())
-            return ResponseEntity.internalServerError().body(deleteWidgetResult.getError());
-
-        return ResponseEntity.ok().build();
+            return ResponseEntity.ok().build();
+        } catch (WidgetNotFoundException exc) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, exc.getMessage(), exc);
+        } catch (Exception exc) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, exc.getMessage(), exc);
+        }
     }
 }
