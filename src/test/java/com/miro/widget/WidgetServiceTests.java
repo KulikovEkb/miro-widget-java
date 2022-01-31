@@ -1,220 +1,166 @@
 package com.miro.widget;
 
-import com.miro.widget.service.WidgetServiceImpl;
-import com.miro.widget.service.repositories.WidgetRepository;
-import com.miro.widget.service.models.WidgetRange;
+import com.miro.widget.exceptions.WidgetNotFoundException;
+import com.miro.widget.service.WidgetServiceImpl2;
+import com.miro.widget.service.repositories.WidgetRepository2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import result.PlainResult;
-import result.Result;
-import result.errors.Error;
-import result.errors.NotFoundError;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import static com.miro.widget.helpers.Generator.*;
+import static com.miro.widget.helpers.Generator2.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class WidgetServiceTests {
-    private final WidgetRepository widgetRepository = Mockito.mock(WidgetRepository.class);
+    private final WidgetRepository2 widgetRepository = Mockito.mock(WidgetRepository2.class);
 
-    WidgetServiceImpl widgetService;
+    WidgetServiceImpl2 widgetService;
 
     @BeforeEach
     public void setUp() {
-        widgetService = new WidgetServiceImpl(widgetRepository);
+        widgetService = new WidgetServiceImpl2(widgetRepository);
     }
 
     @Test
     public void should_successfully_create_single_widget() {
-        var creationDto = generateV1CreateWidgetDto();
-        var widgetDto = convertToWidgetDtoFromCreationDto(creationDto);
+        var creationParams = generateCreationParams();
+        var createdWidget = convertToWidgetFromCreationParams(creationParams);
 
-        when(widgetRepository.getByZIndex(creationDto.getZ()))
-            .thenReturn(Result.Fail(new NotFoundError("")));
-        when(widgetRepository.insert(argThat(x -> x.getZ().equals(creationDto.getZ()))))
-            .thenReturn(Result.Ok(widgetDto));
+        when(widgetRepository.findByZ(creationParams.getZ())).thenReturn(Optional.empty());
+        when(widgetRepository.save(argThat(x -> x.getZ().equals(creationParams.getZ()))))
+            .thenReturn(createdWidget);
 
-        var creationResult = widgetService.create(creationDto);
+        var serviceResult = widgetService.create(creationParams);
 
-        assertTrue(creationResult.isSucceed());
-        assertThat(creationResult.getValue()).usingRecursiveComparison().isEqualTo(widgetDto);
+        assertNotNull(serviceResult);
+        assertThat(serviceResult).usingRecursiveComparison().isEqualTo(createdWidget);
 
-        verify(widgetRepository, times(1)).getByZIndex(creationDto.getZ());
-        verify(widgetRepository, times(1)).insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
-    }
-
-    @Test
-    public void should_be_failed_when_failed_to_insert() {
-        var creationDto = generateV1CreateWidgetDto();
-
-        when(widgetRepository.getByZIndex(creationDto.getZ()))
-            .thenReturn(Result.Fail(new NotFoundError("")));
-        when(widgetRepository.insert(argThat(x -> x.getZ().equals(creationDto.getZ()))))
-            .thenReturn(Result.Fail(new Error("insertion error")));
-
-        var creationResult = widgetService.create(creationDto);
-
-        assertTrue(creationResult.isFailed());
-        assertNull(creationResult.getValue());
-
-        verify(widgetRepository, times(1)).getByZIndex(creationDto.getZ());
-        verify(widgetRepository, times(1)).insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
+        verify(widgetRepository, times(1)).findByZ(creationParams.getZ());
+        verify(widgetRepository, times(1)).save(argThat(x -> x.getZ().equals(creationParams.getZ())));
     }
 
     @Test
     public void should_be_failed_when_failed_to_insert_because_of_Z_index_max_value_reached() {
-        var creationDto = generateV1CreateWidgetDto(Integer.MAX_VALUE - 1);
+        var creationParams = generateCreationParams(Integer.MAX_VALUE - 1);
 
-        when(widgetRepository.getByZIndex(creationDto.getZ()))
-            .thenReturn(Result.Fail(new NotFoundError("")));
-        when(widgetRepository.insert(argThat(x -> x.getZ().equals(creationDto.getZ()))))
-            .thenReturn(Result.Ok(convertToWidgetDtoFromCreationDto(creationDto)));
+        when(widgetRepository.findByZ(creationParams.getZ())).thenReturn(Optional.empty());
+        when(widgetRepository.save(argThat(x -> x.getZ().equals(creationParams.getZ()))))
+            .thenReturn(convertToWidgetFromCreationParams(creationParams));
 
-        widgetService.create(creationDto);
+        widgetService.create(creationParams);
 
-        var creationResult = widgetService.create(generateV1CreateWidgetDto(null));
+        assertThrows(
+            ArithmeticException.class,
+            () -> widgetService.create(generateCreationParams(null)),
+            "Max available Z index value reached");
 
-        assertTrue(creationResult.isFailed());
-        assertNull(creationResult.getValue());
-        assertThat(creationResult.getError().getMessage()).isEqualTo("Max available Z index value reached");
-
-        verify(widgetRepository, times(1)).getByZIndex(creationDto.getZ());
-        verify(widgetRepository, times(1)).insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
+        verify(widgetRepository, times(1)).findByZ(creationParams.getZ());
+        verify(widgetRepository, times(1)).save(argThat(x -> x.getZ().equals(creationParams.getZ())));
     }
 
     @Test
     public void should_successfully_get_by_ID() {
-        var widgetDto = generateV1WidgetDto();
+        var widget = generateWidget();
 
-        when(widgetRepository.getById(widgetDto.getId())).thenReturn(Result.Ok(widgetDto));
+        when(widgetRepository.findById(widget.getId())).thenReturn(Optional.of(widget));
 
-        var getByIdResult = widgetService.getById(widgetDto.getId());
+        var getByIdResult = widgetService.findById(widget.getId());
 
-        assertTrue(getByIdResult.isSucceed());
-        assertThat(getByIdResult.getValue()).usingRecursiveComparison().isEqualTo(widgetDto);
+        assertTrue(getByIdResult.isPresent());
+        assertThat(getByIdResult.get()).usingRecursiveComparison().isEqualTo(widget);
 
-        verify(widgetRepository, times(1)).getById(widgetDto.getId());
+        verify(widgetRepository, times(1)).findById(widget.getId());
     }
 
     @Test
     public void should_be_failed_when_failed_to_get_by_ID() {
         var widgetId = UUID.randomUUID();
 
-        when(widgetRepository.getById(widgetId)).thenReturn(Result.Fail(new NotFoundError("widget not found")));
+        when(widgetRepository.findById(widgetId)).thenReturn(Optional.empty());
 
-        var getByIdResult = widgetService.getById(widgetId);
+        var getByIdResult = widgetService.findById(widgetId);
 
-        assertTrue(getByIdResult.isFailed());
-        assertNull(getByIdResult.getValue());
+        assertTrue(getByIdResult.isEmpty());
 
-        verify(widgetRepository, times(1)).getById(widgetId);
+        verify(widgetRepository, times(1)).findById(widgetId);
     }
 
     @Test
     public void should_successfully_get_all_inserted_widgets() {
-        var widgetDto = generateV1WidgetDto();
+        var widget = generateWidget();
 
-        when(widgetRepository.getRange(1, 1)).thenReturn(Result.Ok(new WidgetRange(1, 1, List.of(widgetDto))));
+        when(widgetRepository.findAll(any())).thenReturn(new PageImpl<>(List.of(widget)));
 
-        var getAllResult = widgetService.getRange(1, 1);
+        var getRangeResult = widgetService.findRange(0, 10);
 
-        assertTrue(getAllResult.isSucceed());
-        assertThat(getAllResult.getValue().getWidgets().size()).isEqualTo(1);
-        assertThat(getAllResult.getValue().getWidgets().get(0)).usingRecursiveComparison().isEqualTo(widgetDto);
+        assertTrue(getRangeResult.hasContent());
+        assertThat(getRangeResult.getContent().size()).isEqualTo(1);
+        assertThat(getRangeResult.getContent().get(0)).usingRecursiveComparison().isEqualTo(widget);
 
-        verify(widgetRepository, times(1)).getRange(1, 1);
+        verify(widgetRepository, times(1)).findAll(PageRequest.of(0, 10).withSort(Sort.by("z")));
     }
 
     @Test
     public void should_successfully_update_single_existing_widget() {
-        var creationDto = generateV1CreateWidgetDto();
-        var createdWidget = convertToWidgetDtoFromCreationDto(creationDto);
-        var updatingDto = generateV1UpdateWidgetDto();
-        var updatedWidget = convertToWidgetDtoFromUpdatingDto(createdWidget.getId(), updatingDto);
+        var creationParams = generateCreationParams();
+        var createdWidget = convertToWidgetFromCreationParams(creationParams);
+        var updatingParams = generateUpdatingParams();
+        var updatedWidget = convertToWidgetFromUpdatingDto(createdWidget.getId(), updatingParams);
 
-        when(widgetRepository.getByZIndex(creationDto.getZ()))
-            .thenReturn(Result.Fail(new NotFoundError("")));
-        when(widgetRepository.getByZIndex(updatingDto.getZ()))
-            .thenReturn(Result.Fail(new NotFoundError("")));
-        when(widgetRepository.insert(argThat(x -> x.getZ().equals(creationDto.getZ()))))
-            .thenReturn(Result.Ok(createdWidget));
-        when(widgetRepository.getById(createdWidget.getId())).thenReturn(Result.Ok(createdWidget));
-        when(widgetRepository.update(argThat(x -> x.getId().equals(createdWidget.getId()))))
-            .thenReturn(Result.Ok(updatedWidget));
+        when(widgetRepository.findByZ(creationParams.getZ())).thenReturn(Optional.empty());
+        when(widgetRepository.findByZ(updatingParams.getZ())).thenReturn(Optional.empty());
+        when(widgetRepository.save(any()))
+            .thenReturn(createdWidget);
+        when(widgetRepository.findById(createdWidget.getId())).thenReturn(Optional.of(createdWidget));
+        when(widgetRepository.save(any()))
+            .thenReturn(updatedWidget);
 
-        widgetService.create(creationDto);
+        widgetService.create(creationParams);
 
-        var updatingResult = widgetService.update(createdWidget.getId(), updatingDto);
+        var updatingResult = widgetService.update(createdWidget.getId(), updatingParams);
 
-        assertTrue(updatingResult.isSucceed());
-        assertThat(updatingResult.getValue()).usingRecursiveComparison().isEqualTo(updatedWidget);
+        assertNotNull(updatingResult);
+        assertThat(updatingResult).usingRecursiveComparison().isEqualTo(updatedWidget);
 
-        verify(widgetRepository, times(1)).getByZIndex(creationDto.getZ());
-        verify(widgetRepository, times(1)).getByZIndex(updatingDto.getZ());
-        verify(widgetRepository, times(1)).insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
-        verify(widgetRepository, times(1)).getById(createdWidget.getId());
-        verify(widgetRepository, times(1)).update(argThat(x -> x.getId().equals(createdWidget.getId())));
-    }
-
-    @Test
-    public void should_be_failed_when_failed_to_update_single_existing_widget() {
-        var creationDto = generateV1CreateWidgetDto();
-        var createdWidget = convertToWidgetDtoFromCreationDto(creationDto);
-        var updatingDto = generateV1UpdateWidgetDto(null);
-
-        when(widgetRepository.getByZIndex(creationDto.getZ()))
-            .thenReturn(Result.Fail(new NotFoundError("")));
-        when(widgetRepository.insert(argThat(x -> x.getZ().equals(creationDto.getZ()))))
-            .thenReturn(Result.Ok(createdWidget));
-        when(widgetRepository.update(argThat(x -> x.getId().equals(createdWidget.getId()))))
-            .thenReturn(Result.Fail(new Error("updating error")));
-
-        widgetService.create(creationDto);
-
-        var updatingResult = widgetService.update(createdWidget.getId(), updatingDto);
-
-        assertTrue(updatingResult.isFailed());
-        assertNull(updatingResult.getValue());
-        assertThat(updatingResult.getError().getMessage()).isEqualTo("updating error");
-
-        verify(widgetRepository, times(1)).getByZIndex(creationDto.getZ());
-        verify(widgetRepository, times(1)).insert(argThat(x -> x.getZ().equals(creationDto.getZ())));
-        verify(widgetRepository, times(1)).update(argThat(x -> x.getId().equals(createdWidget.getId())));
+        verify(widgetRepository, times(1)).findByZ(creationParams.getZ());
+        verify(widgetRepository, times(1)).findByZ(updatingParams.getZ());
+        verify(widgetRepository, times(1)).save(argThat(x -> x.getZ().equals(creationParams.getZ())));
+        verify(widgetRepository, times(1)).findById(createdWidget.getId());
+        verify(widgetRepository, times(1)).save(argThat(x -> x.getId().equals(createdWidget.getId())));
     }
 
     @Test
     public void should_successfully_delete_by_ID() {
         var widgetId = UUID.randomUUID();
 
-        when(widgetRepository.delete(widgetId)).thenReturn(PlainResult.Ok());
+        widgetService.delete(widgetId);
 
-        var deletingResult = widgetRepository.delete(widgetId);
-
-        assertTrue(deletingResult.isSucceed());
-
-        verify(widgetRepository, times(1)).delete(widgetId);
+        verify(widgetRepository, times(1)).deleteById(widgetId);
     }
 
     @Test
     public void should_be_failed_when_failed_to_delete_by_ID() {
         var widgetId = UUID.randomUUID();
 
-        when(widgetRepository.delete(widgetId)).thenReturn(PlainResult.Fail(new Error("deleting error")));
+        doThrow(EmptyResultDataAccessException.class).when(widgetRepository).deleteById(widgetId);
 
-        var deletingResult = widgetRepository.delete(widgetId);
+        assertThrows(
+            WidgetNotFoundException.class,
+            () -> widgetService.delete(widgetId),
+            String.format("Widget with id '%s' not found", widgetId));
 
-        assertTrue(deletingResult.isFailed());
-        assertThat(deletingResult.getError().getMessage()).isEqualTo("deleting error");
-
-        verify(widgetRepository, times(1)).delete(widgetId);
+        verify(widgetRepository, times(1)).deleteById(widgetId);
     }
 }

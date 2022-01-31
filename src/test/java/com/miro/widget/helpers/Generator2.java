@@ -8,18 +8,17 @@ import com.miro.widget.service.models.params.UpdateWidgetParams;
 import com.miro.widget.service.models.widget.Coordinates;
 import com.miro.widget.service.models.widget.Size;
 import com.miro.widget.service.models.widget.Widget;
-import com.miro.widget.service.repositories.models.params.InsertWidgetParams;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public class Generator2 {
-    public static CreateWidgetParams generateV1CreateWidgetDto() {
-        return generateV1CreateWidgetDto(RandomUtils.nextInt());
+    public static CreateWidgetParams generateCreationParams() {
+        return generateCreationParams(RandomUtils.nextInt());
     }
 
-    public static CreateWidgetParams generateV1CreateWidgetDto(Integer z) {
+    public static CreateWidgetParams generateCreationParams(Integer z) {
         return new CreateWidgetParams(
             RandomUtils.nextInt(),
             RandomUtils.nextInt(),
@@ -28,30 +27,40 @@ public class Generator2 {
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }
 
-    public static Widget generateV1WidgetDto() {
-        return new Widget(
+    public static Widget2 generateWidget() {
+        return new Widget2(
             UUID.randomUUID(),
             RandomUtils.nextInt(0, Integer.MAX_VALUE - 1),
-            new Coordinates(RandomUtils.nextInt(), RandomUtils.nextInt()),
-            new Size(RandomUtils.nextInt(1, Integer.MAX_VALUE), RandomUtils.nextInt(1, Integer.MAX_VALUE)),
+            RandomUtils.nextInt(),
+            RandomUtils.nextInt(),
+            RandomUtils.nextInt(1, Integer.MAX_VALUE),
+            RandomUtils.nextInt(1, Integer.MAX_VALUE),
             ZonedDateTime.now());
     }
 
-    public static Widget convertFromV1WidgetDtoToV1WidgetDto(Widget existing, Integer z) {
-        return new Widget(
-            existing.getId(), z, existing.getCoordinates(), existing.getSize(), existing.getUpdatedAt());
+    public static Widget2 convertFromWidgetToWidget(Widget2 existing, Integer z) {
+        return new Widget2(
+            existing.getId(),
+            z,
+            existing.getCenterX(),
+            existing.getCenterY(),
+            existing.getWidth(),
+            existing.getHeight(),
+            existing.getUpdatedAt());
     }
 
-    public static Widget convertToWidgetDtoFromCreationDto(CreateWidgetParams dto) {
-        return new Widget(
+    public static Widget2 convertToWidgetFromCreationParams(CreateWidgetParams dto) {
+        return new Widget2(
             UUID.randomUUID(),
             dto.getZ(),
-            new Coordinates(dto.getCenterX(), dto.getCenterY()),
-            new Size(dto.getWidth(), dto.getHeight()),
+            dto.getCenterX(),
+            dto.getCenterY(),
+            dto.getWidth(),
+            dto.getHeight(),
             ZonedDateTime.now());
     }
 
-    public static UpdateWidgetParams generateV1UpdateWidgetDto() {
+    public static UpdateWidgetParams generateUpdatingParams() {
         return new UpdateWidgetParams(
             RandomUtils.nextInt(),
             RandomUtils.nextInt(),
@@ -60,7 +69,7 @@ public class Generator2 {
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }
 
-    public static UpdateWidgetParams generateV1UpdateWidgetDto(Integer z) {
+    public static UpdateWidgetParams generateUpdatingParams(Integer z) {
         return new UpdateWidgetParams(
             RandomUtils.nextInt(),
             RandomUtils.nextInt(),
@@ -69,12 +78,14 @@ public class Generator2 {
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }
 
-    public static Widget convertToWidgetDtoFromUpdatingDto(UUID id, UpdateWidgetParams dto) {
-        return new Widget(
+    public static Widget2 convertToWidgetFromUpdatingDto(UUID id, UpdateWidgetParams dto) {
+        return new Widget2(
             id,
             dto.getZ(),
-            new Coordinates(dto.getCenterX(), dto.getCenterY()),
-            new Size(dto.getWidth(), dto.getHeight()),
+            dto.getCenterX(),
+            dto.getCenterY(),
+            dto.getWidth(),
+            dto.getHeight(),
             ZonedDateTime.now());
     }
 
@@ -87,12 +98,14 @@ public class Generator2 {
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }
 
-    public static Widget convertToDtoFromCreateRequest(UUID id, V1CreateWidgetRequest request) {
-        return new Widget(
+    public static Widget2 convertToWidgetFromCreateRequest(UUID id, V1CreateWidgetRequest request) {
+        return new Widget2(
             id,
             request.getZ(),
-            new Coordinates(request.getCenterX(), request.getCenterY()),
-            new Size(request.getWidth(), request.getHeight()),
+            request.getCenterX(),
+            request.getCenterY(),
+            request.getWidth(),
+            request.getHeight(),
             ZonedDateTime.now());
     }
 
@@ -105,12 +118,14 @@ public class Generator2 {
             RandomUtils.nextInt(1, Integer.MAX_VALUE));
     }
 
-    public static Widget convertToDtoFromUpdateRequest(UUID id, V1UpdateWidgetRequest request) {
-        return new Widget(
+    public static Widget2 convertToWidgetFromUpdateRequest(UUID id, V1UpdateWidgetRequest request) {
+        return new Widget2(
             id,
             request.getZ(),
-            new Coordinates(request.getCenterX(), request.getCenterY()),
-            new Size(request.getWidth(), request.getHeight()),
+            request.getCenterX(),
+            request.getCenterY(),
+            request.getWidth(),
+            request.getHeight(),
             ZonedDateTime.now());
     }
 
