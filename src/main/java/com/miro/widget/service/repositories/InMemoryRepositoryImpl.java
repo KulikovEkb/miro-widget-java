@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     }
 
     @Override
+    @Transactional
     public Widget save(Widget widget) {
         var existingWidget = idToWidgetMap.getOrDefault(widget.getId(), null);
 
@@ -65,6 +67,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     }
 
     @Override
+    @Transactional
     public <S extends Widget> Iterable<S> saveAll(Iterable<S> widgets) {
         var result = new ArrayList<S>();
 
@@ -173,11 +176,13 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     }
 
     @Override
+    @Transactional
     public void delete(Widget widget) {
         deleteById(widget.getId());
     }
 
     @Override
+    @Transactional
     public void deleteAllById(Iterable<? extends UUID> ids) {
         for (var id : ids) {
             deleteById(id);
@@ -185,12 +190,14 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
     }
 
     @Override
+    @Transactional
     public void deleteAll(Iterable<? extends Widget> widgets) {
         for (var widget : widgets) {
             deleteById(widget.getId());
         }
     }
 
+    @Transactional
     public void deleteAll() {
         idToWidgetMap.clear();
         zIndexToWidgetMap.clear();
