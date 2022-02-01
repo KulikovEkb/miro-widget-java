@@ -50,7 +50,7 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
             zIndexToWidgetMap.remove(existingWidget.getZ());
         }
 
-        var newWidget = new Widget(
+        var widgetForStorage = new Widget(
             widget.getId(),
             widget.getZ(),
             widget.getCenterX(),
@@ -60,10 +60,18 @@ public class InMemoryRepositoryImpl implements WidgetRepository {
             ZonedDateTime.now()
         );
 
-        idToWidgetMap.put(widget.getId(), newWidget);
-        zIndexToWidgetMap.put(widget.getZ(), newWidget);
+        idToWidgetMap.put(widget.getId(), widgetForStorage);
+        zIndexToWidgetMap.put(widget.getZ(), widgetForStorage);
 
-        return newWidget;
+        return new Widget(
+            widgetForStorage.getId(),
+            widgetForStorage.getZ(),
+            widgetForStorage.getCenterX(),
+            widgetForStorage.getCenterY(),
+            widgetForStorage.getWidth(),
+            widgetForStorage.getHeight(),
+            widgetForStorage.getUpdatedAt()
+        );
     }
 
     @Override
